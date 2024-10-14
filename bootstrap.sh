@@ -13,6 +13,8 @@
 # <==============================================>
 #    Arch-linux based personal distro installer
 # <==============================================>
+cd "$(dirname "$0")"
+# <==============================================>
 #  [Procedures] Log:
 # <==============================================>
 # Specify name of the log file
@@ -97,7 +99,7 @@ c_efi () {
 	# <==============================================>
 	if [ ! -e /sys/firmware/efi/fw_platform_size ]; then
 		output "\n> Host has not booted in UEFI mode, thus, it is assumed to not be UEFI capable!" red !
-		exit 1
+		#exit 1
 	fi
 
 	output "# Booted in UEFI x$(cat /sys/firmware/efi/fw_platform_size) mode!" green
@@ -120,7 +122,7 @@ c_net () {
 	# <==============================================>
 	if ! ping archlinux.org -c 2 -q -W 4; then
 		output "\n> Host archlinux.org is not reachable, thus, host may not have a proper network connection!" red !
-		exit 1
+		#exit 1
 	fi
 
 	output "# Network is proper!" green
@@ -132,7 +134,7 @@ c_net () {
 	# <==============================================>
 	if [[ "$(timedatectl show --property=NTPSynchronized | grep -c 'yes')" != "1" ]]; then
 		output "\n> Host is not synchronized with an NTP server, thus, the system time ($(date)) may not be accurate!" red !
-		exit 1
+		#exit 1
 	fi
 
 	output "# Time is proper!" green
@@ -276,16 +278,16 @@ c_part () {
 	# <==============================================>
 	# Create any missing parent (-p) directories
 	# <==============================================>
-	btrfs subvolume create -p /mnt/@arch || return 2 # Mount: /
-	btrfs subvolume create -p /mnt/@home || return 2 # Mount: /home
-	btrfs subvolume create -p /mnt/@root || return 2 # Mount: /root
-	btrfs subvolume create -p /mnt/@cache || return 2 # Mount: /var/cache
-	btrfs subvolume create -p /mnt/@tmp || return 2 # Mount: /var/tmp
-	btrfs subvolume create -p /mnt/@log || return 2 # Mount: /var/log
-	btrfs subvolume create -p /mnt/@snap || return 2 # Mount: /var/snap
-	btrfs subvolume create -p /mnt/@swap || return 2 # Mount: /var/swap
-	btrfs subvolume create -p /mnt/@srv || return 2 # Mount: /srv
-	btrfs subvolume create -p /mnt/@shr || return 2 # Mount: /media/shr
+	btrfs subvolume create /mnt/@arch || return 2 # Mount: /
+	btrfs subvolume create /mnt/@home || return 2 # Mount: /home
+	btrfs subvolume create /mnt/@root || return 2 # Mount: /root
+	btrfs subvolume create /mnt/@cache || return 2 # Mount: /var/cache
+	btrfs subvolume create /mnt/@tmp || return 2 # Mount: /var/tmp
+	btrfs subvolume create /mnt/@log || return 2 # Mount: /var/log
+	btrfs subvolume create /mnt/@snap || return 2 # Mount: /var/snap
+	btrfs subvolume create /mnt/@swap || return 2 # Mount: /var/swap
+	btrfs subvolume create /mnt/@srv || return 2 # Mount: /srv
+	btrfs subvolume create /mnt/@shr || return 2 # Mount: /media/shr
 	btrfs subvolume set-default /mnt/@shr || return 2 # When mounting the btrfs partition default to mounting the @shr subvolume
 
 	output "# Subvolumes created successfully!" green
@@ -327,9 +329,8 @@ c_mnt() {
 	# noatime: Do not update node access time
 	# nodiratime: Do not update directory node access time
 	# nouser: Only the root is allowed to mount the filesystem
-	# fail: If the mount fails, the failure will cause the full boot process to fail
 	# <==============================================>
-	mnt_opts='rw,exec,dev,suid,async,noatime,nodiratime,nouser,fail'
+	mnt_opts='rw,exec,dev,suid,async,noatime,nodiratime,nouser'
 	# <==============================================>
 	# noautodefrag: do not defrag as its a Flash Disk (SSDs or NVMes) and it breaks COW (Linux kernel versions < 3.9 or ≥ 3.14-rc2 as well as with Linux stable kernel versions ≥ 3.10.31, ≥ 3.12.12 or ≥ 3.13.4)
 	# commit=120: Flush data to disk every 120 seconds as to improve troughput by sacrificing write security in case of unexpected shutdown
@@ -373,8 +374,8 @@ c_mnt() {
 	# <==============================================>
 	#  Mount external disks:
 	# <==============================================>
-	mount -m ${device_ex1} "/mnt/media/$(e2label $device_ex1 | grep -oP -m 1 "labelled '\K[^']+")" -o $mnt_opts_btrfs,nosuid,nodev,nofail,noauto,user || return 2
-	mount -m ${device_ex2} "/mnt/media/$(e2label $device_ex2 | grep -oP -m 1 "labelled '\K[^']+")" -o $mnt_opts_btrfs,nosuid,nodev,nofail,noauto,user || return 2
+	mount -m ${device_ex1} "/mnt/media/$(e2label $device_ex1 | grep -oP -m 1 "labelled '\K[^']+")" -o $mnt_opts_btrfs,nosuid,nodev,nofail,noauto,nodiscard,user || return 2
+	mount -m ${device_ex2} "/mnt/media/$(e2label $device_ex2 | grep -oP -m 1 "labelled '\K[^']+")" -o $mnt_opts_btrfs,nosuid,nodev,nofail,noauto,nodiscard,user || return 2
 
 	output "# Mounted ESP and BTRFS subvolumes successfully!" green
 
@@ -538,7 +539,7 @@ c_pkg () {
 	# <=========================>
 	#  git-delta
 	# <=========================>
-	sh_pkgs='fish fisher starship eza micro moreutils fastfetch cmatrix lolcat posix procps-ng bat bat-extras zoxide dateutils ripgrep-all fzf gdu rsync gpm p7zip fd expac prettyping httrack btop cloc jq yazi github-cli unrar zip unzip imagemagick' 
+	sh_pkgs='fish fisher starship eza micro moreutils fastfetch cmatrix lolcat posix procps-ng bat bat-extras zoxide dateutils ripgrep-all fzf gdu rsync gpm p7zip fd expac prettyping httrack btop cloc jq yazi github-cli unrar zip unzip imagemagick'
 	# <==============================================>
 	#  Desktop Packages:
 	# <==============================================>
@@ -616,7 +617,7 @@ c_pkg () {
 	# wine-mono: Wine's built-in replacement for Microsoft's .NET Framework
 	# gamemode: Feral gamemode for optimizing Linux system performance on demand
 	# steam: Game distribution platform
-	# lib32-systemd: For steam to be able to connect to its servers if using systemd-networkd 
+	# lib32-systemd: For steam to be able to connect to its servers if using systemd-networkd
 	# mangohud: A Vulkan and OpenGL overlay for monitoring FPS, temperatures, CPU/GPU load and more
 	# <==============================================>
 	game_pkgs='lutris wine wine-mono gamemode lib32-gamemode steam lib32-systemd mangohud lib32-mangohud'
@@ -646,12 +647,14 @@ c_pkg () {
 	# <==============================================>
 	# Avoid (-M) copying the host’s mirrorlist
 	# <==============================================>
-	(unlog && pacstrap -KM /mnt $pkgs && log) || return 2
+	unlog
+	pacstrap -KM /mnt $pkgs || return 2
+	log
 
 	output "# Packages installed successfully!" green
 
 	output "~ Merging configuration files with new system..." yellow
-	
+
 	# <==============================================>
 	#  Merges preconfigurated files to the new system:
 	# <==============================================>
@@ -664,7 +667,7 @@ c_pkg () {
 	# <==============================================>
 	# Change ownership and group (--chown) to root:root
 	# <==============================================>
-	# Change directory and file permissions (--chmod) 
+	# Change directory and file permissions (--chmod)
 	# <==============================================>
 	rsync -a --chown=root:root --chmod=D755,F644 ./sysroot/ /mnt || return 2
 
@@ -782,6 +785,11 @@ archroot () {
 		pkgs_uns=()
 
 		# <==============================================>
+		#  Update mirrorlist:
+		# <==============================================>
+		systemctl start reflector.service
+
+		# <==============================================>
 		#  Add temporary user to build packages:
 		# <==============================================>
 		useradd -l -m -U -c "TheBuilder" builder || return 2
@@ -797,7 +805,7 @@ archroot () {
 		output "~ Installing local packages..." yellow
 
 		unlog
-		
+
 		# <==============================================>
 		#  Loop trough copied PKGBUILDs and install:
 		# <==============================================>
@@ -811,7 +819,7 @@ archroot () {
 
 		#LOOKOUT
 		# install -dm 500 /etc/skel/.dropbox-dist || return 2 # instead of -dm0 use -dm 444
-		
+
 		log
 
 		output "# Local packages installed successfully!" green
@@ -834,7 +842,7 @@ archroot () {
 			rm -fr "/pkgs/$pkg"
 		done
 
-		log 
+		log
 
 		output "# AUR packages installed successfully!" green
 
@@ -852,7 +860,7 @@ archroot () {
 		(grep -xFv -- "builder ALL = (root) NOPASSWD: PKGMAN" /etc/sudoers | sponge /etc/sudoers) || return 2
 
 		# <==============================================>
-		#  Loop trough dependency packages and 
+		#  Loop trough dependency packages and
 		#  change their install reason to dependency:
 		# <==============================================>
 		for pkg in "${pkgs_deps[@]}"; do
@@ -974,7 +982,7 @@ archroot () {
 		# Enable reflector on boot after network-online.target is reached to update mirrorlist
 		systemctl enable systemd-networkd-wait-online.service || return 2
 		systemctl enable reflector.service || return 2 # Needs systemd-networkd-wait-online.service enabled
-		
+
 		# Enable canberra-system-bootup for having bootup, shutdown and reboot sounds using canberra
 		systemctl enable canberra-system-bootup.service || return 2
 
@@ -1003,7 +1011,8 @@ archroot () {
 		return 0
 	}
 
-	log && (o_local && o_pkgs && o_boot && o_usr && o_srv)
+	log
+	o_local && o_pkgs && o_boot && o_usr && o_srv
 
 	output "[Archroot Setup]" purple !
 
@@ -1018,12 +1027,12 @@ archroot () {
 c_clean () {
 	output "\n[Clean]" purple
 
-	output "~ Checking if the host is booted in UEFI mode..." yellow
+	output "~ Cleaning after installation..." yellow
 
 	# <==============================================>
 	#  Symlink for using systemd-resolved:
 	# <==============================================>
-	# Must be done after install as we lose the 
+	# Must be done after install as we lose the
 	# ability to resolve dns in chroot otherwise
 	# <==============================================>
 	ln -sf /mnt/run/systemd/resolve/stub-resolv.conf /mnt/etc/resolv.conf || return 2
@@ -1045,7 +1054,7 @@ c_clean () {
 	# <==============================================>
 	umount -R /mnt
 
-	output "# Booted in UEFI x$(cat /sys/firmware/efi/fw_platform_size) mode!" green
+	output "# Cleaned after installation successfully!" green
 
 	output "[Clean]" purple !
 	return 0
@@ -1061,12 +1070,12 @@ export -f input
 export -f output
 export -f archroot
 # <==============================================>
-#  Run all functions, in order, chained as to 
+#  Run all functions, in order, chained as to
 #  only run if the previous function has not failed
 # <==============================================>
 log && output "" off && output "$title" purple
 # <==============================================>
-if c_efi && c_net && c_part && c_mnt && c_pkg && arch-chroot /mnt /bin/bash -c "archroot"; then
+if c_efi && c_net && c_part && c_mnt && c_pkg && unlog && arch-chroot /mnt /bin/bash -c "archroot"; then
 	output "\n> Restart to log into the new system!" yellow !
 	output "\n> Installation completed successfully!" green !
 else

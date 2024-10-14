@@ -28,5 +28,6 @@ Depends = moreutils
 Depends = grep
 Depends = bash
 # AbortOnFail
-NeedsTargets # Grep uses targets as patterns
+NeedsTargets
+# Grep uses targets as patterns
 # <===========================================================================>
