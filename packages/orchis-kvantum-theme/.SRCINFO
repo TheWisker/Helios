@@ -1,0 +1,12 @@
+pkgbase = orchis-kvantum-theme
+	pkgdesc = Flat Materia Kvantum theme based on Elegant Design
+	pkgver = v1.0.0
+	pkgrel = 1
+	url = https://github.com/vinceliuice/Orchis-kde
+	arch = any
+	license = GPL-3.0-or-later
+	provides = kvantum-theme
+	source = orchis-src.tar.xz
+	sha512sums = 0f8eeccee244108ab04a0b07dc59a097bf97f9e06a38d4c3ca8e361766c674fe2e7bdec00043b2ae52143aca5220fc2c23fbf070f9c7cbb6a80b399aae58bb3c
+
+pkgname = orchis-kvantum-theme

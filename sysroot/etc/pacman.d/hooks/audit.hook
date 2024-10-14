@@ -1,0 +1,32 @@
+# <===========================================================================>
+
+#                      █████╗ ██╗   ██╗██████╗ ██╗████████╗
+#                     ██╔══██╗██║   ██║██╔══██╗██║╚══██╔══╝
+#                     ███████║██║   ██║██║  ██║██║   ██║
+#                     ██╔══██║██║   ██║██║  ██║██║   ██║
+#                     ██║  ██║╚██████╔╝██████╔╝██║   ██║
+#                     ╚═╝  ╚═╝ ╚═════╝ ╚═════╝ ╚═╝   ╚═╝
+
+# <===========================================================================>
+#  Prints package security breaches posted at https://security.archlinux.org/
+# <===========================================================================>
+#  @Author: TheWisker
+# <===========================================================================>
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = *
+# <===========================================================================>
+[Action]
+Description = Searching for package security breaches...
+Exec = /usr/bin/bash -c '/usr/bin/echo "$(/usr/bin/arch-audit -C always)" > /tmp/arch-audit && /usr/bin/grep -f - /tmp/arch-audit | /usr/bin/ifne -n /usr/bin/echo -e "\e[1m\e[32m==>\e[0m\e[1m no security breaches were found\e[0m"; /usr/bin/rm -f /tmp/arch-audit'
+When = PostTransaction
+Depends = arch-audit
+Depends = coreutils
+Depends = moreutils
+Depends = grep
+Depends = bash
+# AbortOnFail
+NeedsTargets # Grep uses targets as patterns
+# <===========================================================================>

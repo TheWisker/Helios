@@ -1,0 +1,28 @@
+# Maintainer: Wisker <TheWisker@protonmail.com>
+pkgname=zhou-theme
+pkgver=v0.0.2
+pkgrel=1
+pkgdesc="Dynamic and aesthetic AwesomeWM theme"
+arch=('x86_64')
+url="https://github.com/TheWisker/Zhou"
+license=('GPL-3.0-or-later')
+depends=()
+makedepends=('git')
+checkdepends=()
+optdepends=('awesome: for using it with custom configuration')
+provides=('awesome-theme')
+conflicts=('awesome-theme')
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("${pkgname}-${pkgver}::git+https://github.com/TheWisker/Zhou#tag=${pkgver}")
+noextract=()
+validpgpkeys=()
+sha512sums=('f9d77e5bd73885e9964a14b3c120e630b73c97835a98029ecd94c5d7428259e6f587bb41c25d5c412aa5e9ff0b72bc23f699e8d3de472216bc8f72aa6a0f887a')
+
+package() {
+    mkdir -p "${pkgdir}/etc/skel/.config/awesome"
+    cp -r "${srcdir}/${pkgname}-${pkgver}/core/"* "${pkgdir}/etc/skel/.config/awesome"
+}

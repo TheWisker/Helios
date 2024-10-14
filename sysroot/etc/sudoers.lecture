@@ -1,0 +1,17 @@
+
+Welcome, Sudo User!
+
+You've just unlocked the power of `sudo`. Here’s how to wield it wisely:
+
+1. **Think Before You Type**: With `sudo`, you hold great power. Use it wisely and with intention!
+   
+2. **Less is More**: Call upon `sudo` only when truly needed - avoid running as root unless absolutely necessary!
+
+3. **Type Carefully**: A single wayward command can wreak havoc. Double-check before hitting Enter!
+
+4. **You’re Being Watched**: Your `sudo` actions are logged. Use this privilege with honor!
+
+5. **Know Your Commands**: Equip yourself with knowledge. The command `man <command>` is your trusty aide!
+
+Now go forth, and may your commands be swift and your errors few!
+

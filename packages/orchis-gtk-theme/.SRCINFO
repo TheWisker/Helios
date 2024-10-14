@@ -1,0 +1,12 @@
+pkgbase = orchis-gtk-theme
+	pkgdesc = Flat Materia Gtk+ theme based on Elegant Design
+	pkgver = v1.0.0
+	pkgrel = 1
+	url = https://github.com/vinceliuice/Orchis-theme
+	arch = any
+	license = GPL-3.0-or-later
+	provides = gtk-theme
+	source = orchis-src.tar.xz
+	sha512sums = f79ad33ff01be7e5901bd1b3b9b358ba86ebe44ecdc868c9a1b71253ff09ead8c4d63953b72189918661859dc84a2ef10c10e1d0889edd4e75c0c1c849402b45
+
+pkgname = orchis-gtk-theme

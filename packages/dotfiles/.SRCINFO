@@ -1,0 +1,31 @@
+pkgbase = dotfiles
+	pkgdesc = Collection of Linux dotfiles
+	pkgver = v1.1.0
+	pkgrel = 1
+	url = https://github.com/TheWisker/Dotfiles
+	arch = any
+	license = GPL-3.0-or-later
+	makedepends = git
+	optdepends = bat: for using it with custom configuration
+	optdepends = btop: for using it with custom configuration
+	optdepends = fastfetch: for using it with custom configuration
+	optdepends = fish: for using it with custom configuration
+	optdepends = flameshot: for using it with custom configuration
+	optdepends = kitty: for using it with custom configuration
+	optdepends = kvantum: for using it with custom configuration
+	optdepends = mangohud: for using it with custom configuration
+	optdepends = micro: for using it with custom configuration
+	optdepends = picom: for using it with custom configuration
+	optdepends = psd: for using it with custom configuration
+	optdepends = redshift: for using it with custom configuration
+	optdepends = rofi: for using it with custom configuration
+	optdepends = python-pywal: for using it with custom configuration
+	optdepends = ark: for using it with custom configuration
+	optdepends = okular: for using it with custom configuration
+	optdepends = starship: for using it with custom configuration
+	optdepends = yt-playlist: for using it with kitty custom configuration
+	optdepends = linuxshss: for using it with kitty custom configuration
+	source = dotfiles-v1.1.0::git+https://github.com/TheWisker/Dotfiles#tag=v1.1.0
+	sha512sums = 6e6aa191a5244c295905eb259a68656f4c2b962b11274a9807340892370fdbe1e944a3463b3d1b83c934046de426bb91bf0bdd6de38f034e8967a046769cd96e
+
+pkgname = dotfiles

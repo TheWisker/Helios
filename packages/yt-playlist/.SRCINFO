@@ -1,0 +1,15 @@
+pkgbase = yt-playlist
+	pkgdesc = Scripts that wrap the yt-dlp binary to manage playlists
+	pkgver = v2.0.0
+	pkgrel = 1
+	url = https://github.com/TheWisker/Playlists
+	arch = any
+	license = GPL-3.0-or-later
+	makedepends = git
+	depends = bash
+	depends = yt-dlp
+	depends = ffmpeg
+	source = yt-playlist-v2.0.0::git+https://github.com/TheWisker/Playlists#tag=v2.0.0
+	sha512sums = 5ad8993f8354f606d307fcea76d6445e3aaa9ca8af9aff43aad22b8b59fc1bfa9686dafbb4692c6adb8e07e1a4bec49a43e09d588606e5fb5b26aac5ef8a92db
+
+pkgname = yt-playlist

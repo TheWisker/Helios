@@ -1,0 +1,53 @@
+# Maintainer: Wisker <TheWisker@protonmail.com>
+pkgname=suwayomi
+pkgver=v1.1.1
+_revver=r1535
+pkgrel=1
+pkgdesc="A rewrite of Tachiyomi for the Desktop"
+arch=('x86_64')
+url="https://github.com/Suwayomi/Suwayomi-Server"
+license=('MPL-2.0')
+depends=('java-runtime>=8' 'bash')
+makedepends=()
+checkdepends=()
+optdepends=('electron: for running in Electron')
+provides=('suwayomi-server' 'tachidesk-server')
+conflicts=()
+replaces=()
+backup=('etc/suwayomi/server.conf')
+options=()
+install=
+changelog=
+source=("$url/releases/download/$pkgver/Suwayomi-Server-$pkgver-$_revver.jar" "$url/releases/download/$pkgver/Suwayomi-Server-$pkgver-$_revver-linux-assets.tar.gz")
+noextract=("Suwayomi-Server-$pkgver-$_revver.jar")
+validpgpkeys=()
+sha512sums=('8596a99ec5571f581fd0c1c10ef032e5152cd97dda8988be0a310d736f76a32fee046af3ff07b9d10ede5964fe819c8037183d81cf6a1b8562a88c69a1fff11a' '98432deb4a763457e2f6e347b918fb8c03dafefa8d18aae82d42babe45b07e59af41e6584b741a88d066d0741efc0243f3a95064f5f18a290822d9db4c0df134')
+
+package() {
+    local _pkgbase=suwayomi
+    local _pkgname=suwayomi-server
+    # Main jar
+    install -Dm644 "${srcdir}/Suwayomi-Server-$pkgver-$_revver.jar"     "$pkgdir/usr/share/java/$_pkgname/bin/Suwayomi-Server.jar"
+    # Linux assets
+    cd "${srcdir}/Suwayomi-Server-$pkgver-$_revver-linux-assets/"
+    # Configuration file
+    install -Dm644 "$_pkgname.conf"                                     "${pkgdir}/etc/suwayomi/server.conf"
+    # Launcher scripts
+    install -Dm755 "$_pkgname.sh"                                       "${pkgdir}/usr/bin/$_pkgname"
+    install -Dm755 "$_pkgbase-launcher.sh"                              "${pkgdir}/usr/bin/$_pkgbase-launcher"
+    # Application icon
+    install -Dm644 "$_pkgname.png"                                      "${pkgdir}/usr/share/pixmaps/$_pkgname.png"
+    # Sysusers and tmpfiles configurations
+    install -Dm644 "$_pkgname.sysusers"                                 "${pkgdir}/usr/lib/sysusers.d/$_pkgname.conf"
+    install -Dm644 "$_pkgname.tmpfiles"                                 "${pkgdir}/usr/lib/tmpfiles.d/$_pkgname.conf"
+    # Systemd service unit
+    install -Dm644 "$_pkgname.service"                                  "${pkgdir}/usr/lib/systemd/system/$_pkgname.service"
+    # Launcher jar
+    install -Dm644 "Suwayomi-Launcher.jar"                              "$pkgdir/usr/share/java/$_pkgname/Suwayomi-Launcher.jar"
+    # Desktop launchers
+    install -Dm644 "$_pkgname.desktop"                                  "${pkgdir}/usr/share/applications/$_pkgname.desktop"
+    install -Dm644 "$_pkgbase-launcher.desktop"                         "${pkgdir}/usr/share/applications/$_pkgbase-launcher.desktop"
+    # Symlinks
+    mkdir -p "${pkgdir}/etc/skel/.local/share/Tachidesk/"
+    ln -sf "/etc/suwayomi/server.conf"                                  "${pkgdir}/etc/skel/.local/share/Tachidesk/server.conf"
+}

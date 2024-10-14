@@ -1,0 +1,27 @@
+pkgbase = sea-greeter
+	pkgdesc = LightDM greeter made with WebKit2GTK
+	pkgver = git
+	pkgrel = 1
+	url = https://github.com/JezerM/sea-greeter
+	arch = x86_64
+	license = GPL-3.0-or-later
+	makedepends = meson
+	makedepends = ninja
+	makedepends = typescript
+	makedepends = git
+	depends = lightdm
+	depends = libyaml
+	depends = webkit2gtk
+	depends = gtk3
+	depends = gcc-libs
+	depends = glibc
+	depends = glib2
+	depends = hicolor-icon-theme
+	provides = web-greeter
+	conflicts = web-greeter
+	conflicts = nody-greeter
+	backup = etc/lightdm/web-greeter.yml
+	source = sea-greeter-git::git+https://github.com/JezerM/sea-greeter
+	sha512sums = SKIP
+
+pkgname = sea-greeter

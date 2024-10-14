@@ -1,0 +1,36 @@
+# Maintainer: Wisker <TheWisker@protonmail.com>
+pkgname=yt-playlist
+pkgver=v2.0.0
+pkgrel=1
+pkgdesc="Scripts that wrap the yt-dlp binary to manage playlists"
+arch=('any')
+url="https://github.com/TheWisker/Playlists"
+license=('GPL-3.0-or-later')
+depends=('bash' 'yt-dlp' 'ffmpeg')
+makedepends=('git')
+checkdepends=()
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("${pkgname}-${pkgver}::git+https://github.com/TheWisker/Playlists#tag=${pkgver}")
+noextract=()
+validpgpkeys=()
+sha512sums=('5ad8993f8354f606d307fcea76d6445e3aaa9ca8af9aff43aad22b8b59fc1bfa9686dafbb4692c6adb8e07e1a4bec49a43e09d588606e5fb5b26aac5ef8a92db')
+
+prepare() {
+    "${srcdir}/${pkgname}-${pkgver}/install.sh" noconfirm
+    rm -fr "${srcdir}/${pkgname}-${pkgver}/.git"
+}
+
+package() {
+    mkdir -p "${pkgdir}/opt"
+    mkdir -p "${pkgdir}/usr/bin"
+    cp -r "${srcdir}/${pkgname}-${pkgver}/" "${pkgdir}/opt/yt-playlist"
+    ln -sf "/opt/yt-playlist/manager.sh" "${pkgdir}/usr/bin/yt-playlist"
+    ln -sf "/opt/yt-playlist/scanner.sh" "${pkgdir}/usr/bin/ytl-playlist"
+}

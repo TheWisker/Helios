@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Lutris
+Comment=Start lutris standalone
+Exec=/usr/bin/lutris
+TryExec=/usr/bin/lutris
+Type=Application

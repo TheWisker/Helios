@@ -1,0 +1,20 @@
+pkgbase = suwayomi
+	pkgdesc = A rewrite of Tachiyomi for the Desktop
+	pkgver = v1.1.1
+	pkgrel = 1
+	url = https://github.com/Suwayomi/Suwayomi-Server
+	arch = x86_64
+	license = MPL-2.0
+	depends = java-runtime>=8
+	depends = bash
+	optdepends = electron: for running in Electron
+	provides = suwayomi-server
+	provides = tachidesk-server
+	noextract = Suwayomi-Server-v1.1.1-r1535.jar
+	backup = etc/suwayomi/server.conf
+	source = https://github.com/Suwayomi/Suwayomi-Server/releases/download/v1.1.1/Suwayomi-Server-v1.1.1-r1535.jar
+	source = https://github.com/Suwayomi/Suwayomi-Server/releases/download/v1.1.1/Suwayomi-Server-v1.1.1-r1535-linux-assets.tar.gz
+	sha512sums = 7f4097f04ee7fad0f79bf44c701dba346ed6a015e7b4eea5f807b35eb7afbbfbe09ed994f8890edc44f7b256a1a33f3b2659c662cf470f0616e3e9a93bf3eebb
+	sha512sums = 98432deb4a763457e2f6e347b918fb8c03dafefa8d18aae82d42babe45b07e59af41e6584b741a88d066d0741efc0243f3a95064f5f18a290822d9db4c0df134
+
+pkgname = suwayomi

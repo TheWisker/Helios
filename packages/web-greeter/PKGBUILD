@@ -1,0 +1,36 @@
+# Maintainer: Wisker <TheWisker@protonmail.com>
+pkgname=web-greeter
+pkgver=3.5.3
+pkgrel=1
+pkgdesc="A modern, visually appealing greeter for LightDM"
+arch=('x86_64')
+url="https://github.com/JezerM/web-greeter"
+license=('GPL-3.0-or-later')
+depends=('lightdm' 'python3' 'python-gobject' 'python-pyqt5' 'python-pyqt5-webengine' 'python-ruamel-yaml' 'python-pyinotify' 'python-xlib' 'qt5-webengine' 'qt5-webengine' 'gobject-introspection' 'libxcb' 'libx11' 'hicolor-icon-theme' 'glibc')
+makedepends=('rsync' 'zip' 'make' 'gcc' 'typescript' 'git')
+checkdepends=()
+optdepends=('acpid: brightness control and battery status support')
+provides=()
+conflicts=('nody-greeter' 'sea-greeter')
+replaces=()
+backup=('etc/lightdm/web-greeter.yml')
+options=()
+install=
+changelog=
+source=("${pkgname}-${pkgver}::git+https://github.com/JezerM/web-greeter#tag=${pkgver}" "package.patch")
+noextract=()
+validpgpkeys=()
+sha512sums=('9f91157806b1377d78cace041091002477b02d83d1662cbbf27f22c1356266b9f55afe010849f86ae9ba08345eb3155c481f1bf905d31f1f53944e65717000ff' '8146f3e6047fff6ebd24cd6a2fda91322e75bef24d54cad5112e4f0daffc4f0713505f062dfb9c24255de0c2a08856f3224fe57a668247941eba73f434cad0d6')
+
+prepare() {
+    patch -d "$srcdir/${pkgname}-${pkgver}" --strip=1 --forward --input="${srcdir}/package.patch"
+    git -C "$srcdir/${pkgname}-${pkgver}" submodule update --init --recursive
+}
+
+build() {
+    make -C "$srcdir/${pkgname}-${pkgver}" build
+}
+
+package() {
+    make -C "$srcdir/${pkgname}-${pkgver}" DESTDIR="$pkgdir/" install
+}

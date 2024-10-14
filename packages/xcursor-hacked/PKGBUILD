@@ -1,0 +1,32 @@
+# Maintainer: Wisker <TheWisker@protonmail.com>
+pkgname=xcursor-hacked
+pkgver=v1.0.0 #28/9/24
+pkgrel=1
+pkgdesc="Hacked Serie X11 cursor themes, is a modification of the variation Hacked of Breeze Cursors by Ken Vermette"
+arch=('any')
+url="https://store.kde.org/p/1099962"
+license=('GPL-3.0-or-later')
+depends=()
+makedepends=()
+checkdepends=()
+optdepends=()
+provides=('xcursor-theme')
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("hacked-src.tar.xz")
+noextract=()
+validpgpkeys=()
+sha512sums=('8af5e3a85533d6651608b2b233dfec0e2a584d0d656b0241066890c47da1001ef85e2634525ed1dd83a51ce4cb9e61ecda47b0bd73de3facf8388c792ca4bc4c')
+
+prepare() {
+    tar -C "${srcdir}/" -xJf "${srcdir}/hacked-src.tar.xz"
+}
+
+package() {
+    mkdir -p "${pkgdir}/usr/share/icons/"
+    cp -r "${srcdir}/Hacked" "${pkgdir}/usr/share/icons/"
+}

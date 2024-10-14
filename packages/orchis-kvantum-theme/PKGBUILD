@@ -1,0 +1,32 @@
+# Maintainer: Wisker <TheWisker@protonmail.com>
+pkgname=orchis-kvantum-theme
+pkgver=v1.0.0 #28/9/24
+pkgrel=1
+pkgdesc="Flat Materia Kvantum theme based on Elegant Design"
+arch=('any')
+url="https://github.com/vinceliuice/Orchis-kde"
+license=('GPL-3.0-or-later')
+depends=()
+makedepends=()
+checkdepends=()
+optdepends=()
+provides=('kvantum-theme')
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("orchis-src.tar.xz")
+noextract=()
+validpgpkeys=()
+sha512sums=('0f8eeccee244108ab04a0b07dc59a097bf97f9e06a38d4c3ca8e361766c674fe2e7bdec00043b2ae52143aca5220fc2c23fbf070f9c7cbb6a80b399aae58bb3c')
+
+prepare() {
+    tar -C "${srcdir}/" -xJf "${srcdir}/orchis-src.tar.xz"
+}
+
+package() {
+    mkdir -p "${pkgdir}/usr/share/Kvantum"
+    cp -r "$srcdir/Orchis" "${pkgdir}/usr/share/Kvantum"
+}

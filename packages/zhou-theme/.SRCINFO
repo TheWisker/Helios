@@ -1,0 +1,15 @@
+pkgbase = zhou-theme
+	pkgdesc = Dynamic and aesthetic AwesomeWM theme
+	pkgver = v0.0.2
+	pkgrel = 1
+	url = https://github.com/TheWisker/Zhou
+	arch = x86_64
+	license = GPL-3.0-or-later
+	makedepends = git
+	optdepends = awesome: for using it with custom configuration
+	provides = awesome-theme
+	conflicts = awesome-theme
+	source = zhou-theme-v0.0.2::git+https://github.com/TheWisker/Zhou#tag=v0.0.2
+	sha512sums = f9d77e5bd73885e9964a14b3c120e630b73c97835a98029ecd94c5d7428259e6f587bb41c25d5c412aa5e9ff0b72bc23f699e8d3de472216bc8f72aa6a0f887a
+
+pkgname = zhou-theme

@@ -1,0 +1,48 @@
+# Maintainer: Wisker <TheWisker@protonmail.com>
+pkgname=dotfiles
+pkgver=v1.1.0
+pkgrel=1
+pkgdesc="Collection of Linux dotfiles"
+arch=('any')
+url="https://github.com/TheWisker/Dotfiles"
+license=('GPL-3.0-or-later')
+depends=()
+makedepends=('git')
+checkdepends=()
+optdepends=(
+    'bat: for using it with custom configuration'
+    'btop: for using it with custom configuration'
+    'fastfetch: for using it with custom configuration'
+    'fish: for using it with custom configuration'
+    'flameshot: for using it with custom configuration'
+    'kitty: for using it with custom configuration'
+    'kvantum: for using it with custom configuration'
+    'mangohud: for using it with custom configuration'
+    'micro: for using it with custom configuration'
+    'picom: for using it with custom configuration'
+    'psd: for using it with custom configuration'
+    'redshift: for using it with custom configuration'
+    'rofi: for using it with custom configuration'
+    'python-pywal: for using it with custom configuration'
+    'ark: for using it with custom configuration'
+    'okular: for using it with custom configuration'
+    'starship: for using it with custom configuration'
+    'yt-playlist: for using it with kitty custom configuration'
+    'linuxshss: for using it with kitty custom configuration'
+)
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("${pkgname}-${pkgver}::git+https://github.com/TheWisker/Dotfiles#tag=${pkgver}")
+noextract=()
+validpgpkeys=()
+sha512sums=('6e6aa191a5244c295905eb259a68656f4c2b962b11274a9807340892370fdbe1e944a3463b3d1b83c934046de426bb91bf0bdd6de38f034e8967a046769cd96e')
+
+package() {
+    mkdir -p "${pkgdir}/etc/skel/.config/"
+    cp -r "${srcdir}/${pkgname}-${pkgver}/.config/"* "${pkgdir}/etc/skel/.config/"
+}

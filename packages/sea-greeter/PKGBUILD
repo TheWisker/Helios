@@ -1,0 +1,36 @@
+# Maintainer: Wisker <TheWisker@protonmail.com>
+pkgname=sea-greeter
+pkgver=git
+pkgrel=1
+pkgdesc="LightDM greeter made with WebKit2GTK"
+arch=('x86_64')
+url="https://github.com/JezerM/sea-greeter"
+license=('GPL-3.0-or-later')
+depends=('lightdm' 'libyaml' 'webkit2gtk' 'gtk3' 'gcc-libs' 'glibc' 'glib2' 'hicolor-icon-theme')
+makedepends=('meson' 'ninja' 'typescript' 'git')
+checkdepends=()
+# optdepends=('acpid: brightness control and battery status support') -> Currently not supported
+provides=('web-greeter')
+conflicts=('web-greeter' 'nody-greeter')
+replaces=()
+backup=('etc/lightdm/web-greeter.yml')
+options=()
+install=
+changelog=
+source=("${pkgname}-${pkgver}::git+https://github.com/JezerM/sea-greeter") # #tag=${pkgver} -> No current release
+noextract=()
+validpgpkeys=()
+sha512sums=('SKIP')
+
+prepare() {
+    git -C "${srcdir}/${pkgname}-${pkgver}" submodule update --init --recursive
+}
+
+build() {
+    arch-meson "${srcdir}/${pkgname}-${pkgver}" "${srcdir}/${pkgname}-${pkgver}/build"
+    ninja -C "${srcdir}/${pkgname}-${pkgver}/build"
+}
+
+package() {
+    meson install -C "${srcdir}/${pkgname}-${pkgver}/build" --destdir "${pkgdir}"
+}

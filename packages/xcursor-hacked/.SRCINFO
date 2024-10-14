@@ -1,0 +1,12 @@
+pkgbase = xcursor-hacked
+	pkgdesc = Hacked Serie X11 cursor themes, is a modification of the variation Hacked of Breeze Cursors by Ken Vermette
+	pkgver = v1.0.0
+	pkgrel = 1
+	url = https://store.kde.org/p/1099962
+	arch = any
+	license = GPL-3.0-or-later
+	provides = xcursor-theme
+	source = hacked-src.tar.xz
+	sha512sums = 8af5e3a85533d6651608b2b233dfec0e2a584d0d656b0241066890c47da1001ef85e2634525ed1dd83a51ce4cb9e61ecda47b0bd73de3facf8388c792ca4bc4c
+
+pkgname = xcursor-hacked

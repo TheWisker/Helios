@@ -1,0 +1,12 @@
+pkgbase = enchanted-sound-theme
+	pkgdesc = Enchanted complete system sounds
+	pkgver = v1.0.0
+	pkgrel = 1
+	url = https://github.com/rtlewis88/rtl88-Themes/tree/Enchanted-Complete-System-Sounds
+	arch = any
+	license = GPL-3.0-or-later
+	provides = sound-theme
+	source = enchanted-src.tar.xz
+	sha512sums = 77fcfd0b8824cb8ff506e805bc393a9624628c70c6a030ed1409ca13fcbb8cce1fe33d38ab7faeecd365115ff4a52a4277692211ebb1c163b02a57b0afa8033a
+
+pkgname = enchanted-sound-theme

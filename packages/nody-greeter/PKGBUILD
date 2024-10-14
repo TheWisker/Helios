@@ -1,0 +1,43 @@
+# Maintainer: Wisker <TheWisker@protonmail.com>
+pkgname=nody-greeter
+pkgver=1.6.2
+pkgrel=1
+pkgdesc="LightDM greeter that allows to create wonderful themes with web technologies. Made in Node.js"
+arch=('x86_64')
+url="https://github.com/JezerM/nody-greeter"
+license=('GPL-3.0-or-later')
+depends=('lightdm' 'gobject-introspection' 'cairo' 'libxcb' 'libx11' 'nss' 'libxcomposite' 'pango' 'nspr' 'hicolor-icon-theme' 'gtk3' 'at-spi2-core' 'alsa-lib' 'libcups' 'libxkbcommon' 'libxdamage')
+makedepends=('nodejs<19' 'npm' 'python3' 'git')
+checkdepends=()
+optdepends=('acpid: brightness control and battery status support')
+provides=('web-greeter')
+conflicts=('web-greeter' 'sea-greeter')
+replaces=()
+backup=('etc/lightdm/web-greeter.yml')
+options=()
+install=
+changelog=
+source=("${pkgname}-${pkgver}::git+https://github.com/JezerM/nody-greeter#tag=${pkgver}" "package.patch")
+noextract=()
+validpgpkeys=()
+sha512sums=('d997092f267ca41b734aaea4fe231cd5210739b08614d329d95431858cd4120fbea7d76a7e147f0f7acf09ffa17f987d47d40e4e09237d02964685180865efb7' '63396c97ebc6e6fc814723ba0e87877777790f4649a35f7434222eef4737937cfd4d11c82b5a0dac53c20f3d31d8d587205a63cb4ae8a8ab616ce0ce53bf72e6')
+
+prepare() {
+    cd "$srcdir/${pkgname}-${pkgver}"
+    patch -d "$srcdir/${pkgname}-${pkgver}" --strip=1 --forward --input="${srcdir}/package.patch"
+    git -C "$srcdir/${pkgname}-${pkgver}" submodule update --init --recursive
+    npm install
+}
+
+build() {
+    cd "$srcdir/${pkgname}-${pkgver}"
+    npm run rebuild
+    npm run build
+}
+
+package() {
+    cd "${pkgname}-${pkgver}"
+    node make --DEST_DIR="${pkgdir}/" install
+    install -d "${pkgdir}/usr/bin"
+    ln -s "/opt/${pkgname}/nody-greeter" "${pkgdir}/usr/bin"
+}

@@ -1,0 +1,37 @@
+# Maintainer: Wisker <TheWisker@protonmail.com>
+pkgname=cavasik
+pkgver=v2.0.1
+pkgrel=1
+pkgdesc="Audio visualizer based on CAVA"
+arch=('any')
+url="https://github.com/TheWisker/Cavasik"
+license=('GPL-3.0-or-later')
+depends=('cava' 'libadwaita' 'python' 'python-gobject' 'python-cairo' 'python-pydbus' 'glib2' 'hicolor-icon-theme' 'gtk4' 'dconf')
+makedepends=('git' 'meson')
+checkdepends=('appstream-glib')
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=("${pkgname}-${pkgver}::git+https://github.com/TheWisker/Cavasik#tag=${pkgver}")
+noextract=()
+validpgpkeys=()
+sha512sums=('5c234b151d636904ec641e6122c2450d40eec0b01055b1c4b265efc2ed3af802d0bedea1d22de69b01ca42000191ecf50e97298f49c96b447cc2f7fd6ef03efb')
+
+build() {
+    arch-meson "${srcdir}/${pkgname}-${pkgver}" "${srcdir}/${pkgname}-${pkgver}/build"
+    meson compile -C "${srcdir}/${pkgname}-${pkgver}/build"
+}
+
+check() {
+    meson test -C "${srcdir}/${pkgname}-${pkgver}/build" --print-errorlog
+}
+
+package() {
+    meson install -C "${srcdir}/${pkgname}-${pkgver}/build" --destdir "${pkgdir}"
+    install -Dm644 "${srcdir}/${pkgname}-${pkgver}/LICENSE" -t "${pkgdir}/usr/share/licenses/cavasik"
+}

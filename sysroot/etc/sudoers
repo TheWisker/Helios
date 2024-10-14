@@ -1,0 +1,111 @@
+# <============================================================>
+
+#   ███████╗██╗   ██╗██████╗  ██████╗ ███████╗██████╗ ███████╗
+#   ██╔════╝██║   ██║██╔══██╗██╔═══██╗██╔════╝██╔══██╗██╔════╝
+#   ███████╗██║   ██║██║  ██║██║   ██║█████╗  ██████╔╝███████╗
+#   ╚════██║██║   ██║██║  ██║██║   ██║██╔══╝  ██╔══██╗╚════██║
+#   ███████║╚██████╔╝██████╔╝╚██████╔╝███████╗██║  ██║███████║
+#   ╚══════╝ ╚═════╝ ╚═════╝  ╚═════╝ ╚══════╝╚═╝  ╚═╝╚══════╝
+
+# <============================================================>
+#   This file MUST be edited with the 'visudo' command as root
+# <============================================================>
+#                       @Author: TheWisker
+# <============================================================>
+#                          man sudoers
+# <============================================================>
+#  Defaults Specification:
+# <============================================================>
+# Whether to change $HOME to the target user's home directory
+Defaults    !always_set_home
+# <============================================================>
+# Whether users have to authenticate themselves via password before they may run commands
+Defaults    authenticate
+# <============================================================>
+# Whether to allow the process to run in the background
+Defaults    !exec_background
+# <============================================================>
+# Whether to use the EDITOR or VISUAL environment variables to select a editor when using visudo
+Defaults    env_editor
+# <============================================================>
+# Whether to run sudo in a minimal environment containing the TERM, PATH, HOME, MAIL, SHELL, LOGNAME, USER, USERNAME and SUDO_* variables, plus rules
+Defaults    env_reset
+# <============================================================>
+# Whether to insult the user when they input a wrong password
+Defaults    insults
+# <============================================================>
+# Whether to execute all commands in noexec mode
+Defaults    noexec
+# <============================================================>
+# Whether to provide a visual feedback when a user presses a key when inputting the password
+Defaults    pwfeedback
+# <============================================================>
+# Whether to run a shell session if sudo is used without specifying a command
+Defaults    shell_noargs
+# <============================================================>
+# Whether to authenticate on a per-tty basis
+Defaults    tty_tickets
+# <============================================================>
+# Whether to run the command in a pseudo-pty even if no I/O logging is being done
+Defaults    use_pty
+# <============================================================>
+# Whether to run sudo if the password input is visible
+Defaults    !visiblepw
+# <============================================================>
+# Number of tries for inputting the correct password before sudo exits
+Defaults    passwd_tries        =   2
+# <============================================================>
+# Time, in minutes, to wait for password input
+Defaults    passwd_timeout      =   0
+# <============================================================>
+# Time, in minutes, to cache users permissions as to avoid entering the password many times in succession
+Defaults    timestamp_timeout   =   0.5
+# <============================================================>
+# Allowed values for the environment variables used with visudo
+Defaults    editor              =   "/usr/bin/nano:/usr/bin/micro"
+# <============================================================>
+# Prompt to use when asking for a password
+Defaults    passprompt          =   "^G[SUDO] (%u -> %U) Password for %p: "
+# <============================================================>
+# Default user to run commands as
+Defaults    runas_default       =   root
+# <============================================================>
+# Whether to print the lecture when running sudo (once | never | always)
+Defaults    lecture             =   once
+# <============================================================>
+# File containing the lecture to print
+Defaults    lecture_file        =   "/etc/sudoers.lecture"
+# <============================================================>
+# Ask for password when running 'sudo -l' which lists user privileges (all | always | any | never)
+Defaults    listpw              =   always
+# <============================================================>
+# Path to use for every command run from sudo
+Defaults    secure_path         =   "~/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/bin"
+# <============================================================>
+#  Commands Alias:
+# <============================================================>
+Cmnd_Alias  POWER       =   /usr/bin/shutdown -h now, /usr/bin/halt, /usr/bin/poweroff, /usr/bin/reboot, /usr/bin/systemctl sleep|reboot|suspend|poweroff|hibernate
+Cmnd_Alias  STORAGE     =   /usr/bin/mount, /usr/bin/umount, /usr/bin/fdisk
+# <============================================================>
+Cmnd_Alias  SYSTEMD     =   /usr/bin/journalctl, /usr/bin/systemctl
+Cmnd_Alias  KILL        =   /usr/bin/pkill, /usr/bin/kill, /usr/bin/killall
+Cmnd_Alias  PKGMAN      =   /usr/bin/pacman, /usr/bin/makepkg
+Cmnd_Alias  NETWORK     =   /usr/bin/netctl, /usr/bin/systemctl enable|disable|restart|reenable|start|stop networkd.service, /usr/bin/systemctl enable|disable|restart|reenable|start|stop resolved.service
+# <============================================================>
+Cmnd_Alias  PSSWD       =   /usr/bin/passwd [A-Za-z]*, /usr/bin/passwd -l root, /usr/bin/passwd -u root, /usr/bin/faillock --user [A-Za-z]* --reset, !/usr/bin/passwd root
+Cmnd_Alias  SHELL       =   /usr/bin/zsh, /usr/bin/bash, /usr/bin/fish
+# <============================================================>
+#  User & Group Privileges Specification:
+# <============================================================>
+%power      ALL         =   (root)  NOPASSWD: POWER
+%network    ALL         =   (root)  NETWORK
+%storage    ALL         =   (root)  STORAGE
+# <============================================================>
+root        ALL         =   (ALL)   ALL
+# <============================================================>
+wisker	    ALL         =   (root)  SHELL, PKGMAN, SYSTEMD, KILL
+# <============================================================>
+#  Drop-in Files:
+# <============================================================>
+@includedir /etc/sudoers.d
+# <============================================================>

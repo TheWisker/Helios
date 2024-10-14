@@ -1,0 +1,22 @@
+# <===================================>
+
+#    ██████╗████████╗██╗  ██╗██████╗ 
+#   ██╔════╝╚══██╔══╝██║ ██╔╝╚════██╗
+#   ██║  ███╗  ██║   █████╔╝  █████╔╝
+#   ██║   ██║  ██║   ██╔═██╗ ██╔═══╝ 
+#   ╚██████╔╝  ██║   ██║  ██╗███████╗
+#    ╚═════╝   ╚═╝   ╚═╝  ╚═╝╚══════╝
+
+# <===================================>
+#          @Author: TheWisker                   
+# <===================================>
+gtk-theme-name = "Orchis"
+gtk-icon-theme-name = "Amy"
+gtk-font-name = "Iosevka Nerd Font 11"
+gtk-application-prefer-dark-theme = true
+# <===================================>
+gtk-enable-event-sounds = true
+gtk-cursor-theme-name = "Hacked"
+gtk-sound-theme-name = "Enchanted"
+gtk-enable-input-feedback-sounds = true
+# <===================================>
