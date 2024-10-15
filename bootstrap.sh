@@ -834,10 +834,10 @@ archroot () {
 			# Check if package is in pkgs array for installing
 			if [[ "$(echo ${pkgs[@]} | grep -cwF -m 1 "$(basename "$pkg")")" == "1" ]]; then
 				# Extract specific variable from PKGBUILD
-				depends=("$(source "./PKGBUILD" && echo "${depends[@]}")")
+				depends=("$(source "$pkg/PKGBUILD" && echo "${depends[@]}")")
 
 				# Extract specific variable from PKGBUILD
-				makedepends=("$(source "./PKGBUILD" && echo "${makedepends[@]}")")
+				makedepends=("$(source "$pkg/PKGBUILD" && echo "${makedepends[@]}")")
 
 				# Only add packages not already installed
 				for mkdp in "${makedepends[@]}"; do
@@ -884,10 +884,10 @@ archroot () {
 			su - builder -c "git -C /pkgs clone "https://aur.archlinux.org/$(basename "$pkg").git
 
 			# Extract specific variable from PKGBUILD
-			depends=("$(source "./PKGBUILD" && echo "${depends[@]}")")
+			depends=("$(source "$pkg/PKGBUILD" && echo "${depends[@]}")")
 
 			# Extract specific variable from PKGBUILD
-			makedepends=("$(source "./PKGBUILD" && echo "${makedepends[@]}")")
+			makedepends=("$(source "$pkg/PKGBUILD" && echo "${makedepends[@]}")")
 
 			# Only add packages not already installed
 			for mkdp in "${makedepends[@]}"; do
