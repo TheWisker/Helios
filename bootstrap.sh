@@ -13,12 +13,15 @@
 # <==============================================>
 #    Arch-linux based personal distro installer
 # <==============================================>
+#  Change directory to that of the script
+# <==============================================>
 cd "$(dirname "$0")"
 # <==============================================>
 #  [Procedures] Log:
 # <==============================================>
-# Specify name of the log file
+# Specify name of the log files
 # <==============================================>
+export logfile_in="./helios.in.log"
 export logfile_out="./helios.out.log"
 # <==============================================>
 # Clear $logfile creating it if it does not exist
@@ -122,7 +125,7 @@ c_net () {
 	# <==============================================>
 	if ! ping archlinux.org -c 2 -q -W 4; then
 		output "\n> Host archlinux.org is not reachable, thus, host may not have a proper network connection!" red !
-		#exit 1
+		exit 1
 	fi
 
 	output "# Network is proper!" green
@@ -134,7 +137,7 @@ c_net () {
 	# <==============================================>
 	if [[ "$(timedatectl show --property=NTPSynchronized | grep -c 'yes')" != "1" ]]; then
 		output "\n> Host is not synchronized with an NTP server, thus, the system time ($(date)) may not be accurate!" red !
-		#exit 1
+		exit 1
 	fi
 
 	output "# Time is proper!" green
@@ -638,6 +641,11 @@ c_pkg () {
 	# <==============================================>
 	pkgs="$sys_pkgs $boot_pkgs $pkgs_pkgs $disk_pkgs $btrfs_pkgs $nvidia_pkgs $audio_pkgs $sh_pkgs $desktop_pkgs $font_pkgs $app_pkgs $game_pkgs $bth_pkgs pkgstats"
 
+	# <==============================================>
+	#  Update mirrorlist:
+	# <==============================================>
+	reflector --connection-timeout 10 --download-timeout 30 --cache-timeout 300 --url https://archlinux.org/mirrors/status/json/ --save /etc/pacman.d/mirrorlist --sort rate --threads 2 --age 24 --delay 2 --country Spain,Portugal,France, --latest 8 --protocol https
+
 	output "~ Installing packages to new root..." yellow
 
 	# <==============================================>
@@ -648,7 +656,8 @@ c_pkg () {
 	# Avoid (-M) copying the host’s mirrorlist
 	# <==============================================>
 	unlog
-	pacstrap -KM /mnt $pkgs || return 2
+	pacstrap -KM /mnt $pkgs || (log && return 2)
+	#pacstrap -K /mnt $pkgs || (log && return 2)
 	log
 
 	output "# Packages installed successfully!" green
@@ -672,6 +681,13 @@ c_pkg () {
 	rsync -a --chown=root:root --chmod=D755,F644 ./sysroot/ /mnt || return 2
 
 	# <==============================================>
+	#  Set permissions for pacman hooks:
+	# <==============================================>
+	# Pacman hooks need execute permission
+	# <==============================================>
+	chmod +x /mnt/etc/pacman.d/hooks/*
+
+	# <==============================================>
 	#  Copy packages for building in archroot:
 	# <==============================================>
 	# Copy recursively (-r) all files and directories
@@ -686,7 +702,7 @@ c_pkg () {
 	# <==============================================>
 	chmod -c 0440 /mnt/etc/sudoers || return 2
 
-	output "# Configuration files merged successfully!"
+	output "# Configuration files merged successfully!" green
 
 	output "[Packages & Configs]" purple !
 	return 0
@@ -701,10 +717,6 @@ archroot () {
 	# <==============================================>
 	#  [Procedures] Log:
 	# <==============================================>
-	# Specify name of the log file
-	# <==============================================>
-	export logfile_in="./helios.in.log"
-	# <==============================================>
 	# Clear $logfile creating it if it does not exist
 	# <==============================================>
 	> $logfile_in
@@ -713,20 +725,17 @@ archroot () {
 	# <==============================================>
 	# Enable log
 	# <==============================================>
-	log () {
+	log_in () {
 		# Redirect /dev/fd/3 to the console and stdout and stderr in append mode to $logfile_in
 		exec 3>&1 1>>${logfile_in} 2>&1
 	}
 	# <==============================================>
 	# Disable log
 	# <==============================================>
-	unlog () {
+	unlog_in () {
 		# Redirect stdout and stderr to the console and /dev/fd/3 in append mode to $logfile_in
 		exec 1>&3 3>>${logfile_in} 2>&1
 	}
-
-	output "\n[Archroot Setup]" purple
-
 	# <==============================================>
 	#  [Function] Time & Locales:
 	# <==============================================>
@@ -781,30 +790,42 @@ archroot () {
 		pkgs=(sea-greeter shikai-theme orchis-gtk-theme orchis-kvantum-theme amy-icon-theme xcursor-hacked enchanted-sound-theme zhou-theme yt-playlist suwayomi linuxshss dotfiles)
 		pkgs_deps=(calf lsp-plugins-lv2 ffmpegthumbs kdegraphics-thumbnailers libcanberra python-pygments python-gpgme smplayer-skins smplayer-themes xclip)
 		pkgs_aur=(dropbox jdownloader2)
+		pkgs_tmp=()
 		pkgs_ins=()
 		pkgs_uns=()
 
 		# <==============================================>
 		#  Update mirrorlist:
 		# <==============================================>
-		systemctl start reflector.service
+		reflector --connection-timeout 10 --download-timeout 30 --cache-timeout 300 --url https://archlinux.org/mirrors/status/json/ --save /etc/pacman.d/mirrorlist --sort rate --threads 2 --age 24 --delay 2 --country Spain,Portugal,France, --latest 8 --protocol https
 
 		# <==============================================>
 		#  Add temporary user to build packages:
 		# <==============================================>
 		useradd -l -m -U -c "TheBuilder" builder || return 2
 		# <==============================================>
-		#  Add temporary privileges for building packages:
-		# <==============================================>
-		(echo "builder ALL = (root) NOPASSWD: PKGMAN" >> /etc/sudoers) || return 2
-		# <==============================================>
 		#  Change /pkgs ownership to said user:
 		# <==============================================>
 		chown -R builder:builder /pkgs || return 2
+		# <==============================================>
+		#  Make building dirs and give permissions:
+		# <==============================================>
+		#mkdir -p /tmp/makepkg/{out, src} || return 2
+		#chown -R builder:builder /tmp/makepkg/{out, src} || return 2
 
-		output "~ Installing local packages..." yellow
+		output "~ Initializing and populating archlinux keyring..." yellow
 
-		unlog
+		# <==============================================>
+		#  Initialize and populate archlinux keyring:
+		# <==============================================>
+		pacman-key --init || return 2
+		pacman-key --populate archlinux || return 2
+
+		output "# Initialized and populated archlinux keyring successfully!" green
+
+		output "~ Building local packages..." yellow
+
+		unlog_in
 
 		# <==============================================>
 		#  Loop trough copied PKGBUILDs and install:
@@ -812,52 +833,102 @@ archroot () {
 		for pkg in /pkgs/*/; do
 			# Check if package is in pkgs array for installing
 			if [[ "$(echo ${pkgs[@]} | grep -cwF -m 1 "$(basename "$pkg")")" == "1" ]]; then
-				(su - builder -c "makepkg -D \"$pkg\" -fcirs --noconfirm") && pkgs_ins+=("$(basename "$pkg")") || pkgs_uns+=("$(basename "$pkg")")
+				# Extract specific variable from PKGBUILD
+				depends=("$(source "./PKGBUILD" && echo "${depends[@]}")")
+
+				# Extract specific variable from PKGBUILD
+				makedepends=("$(source "./PKGBUILD" && echo "${makedepends[@]}")")
+
+				# Only add packages not already installed
+				for mkdp in "${makedepends[@]}"; do
+					if ! pacman -Qq "$mkdp" > /dev/null 2>&1; then
+						pkgs_tmp+=("$mkdp")
+					fi
+				done
+
+				# Install depends and makedepends
+				pacman -Sy --needed --noconfirm ${makedepends[@]} ${depends[@]}
+
+				# Build pkg, which will be stored in ~/.pkgs as per makepkg.conf
+				(su - builder -c "makepkg -D "$pkg" -fcr --noconfirm") && pkgs_ins+=("$(basename "$pkg")") || pkgs_uns+=("$(basename "$pkg")")
+
+				# Remove files that are not needed
 				rm -fr "$pkg"
+				rm -fr /tmp/makepkg/*
 			fi
 		done
 
 		#LOOKOUT
-		# install -dm 500 /etc/skel/.dropbox-dist || return 2 # instead of -dm0 use -dm 444
+		#install -dm 500 /etc/skel/.dropbox-dist || return 2 # instead of -dm0 use -dm 444
 
-		log
+		log_in
 
-		output "# Local packages installed successfully!" green
+		output "# Local packages built successfully!" green
 
 		# <==============================================>
 		#  Remove package source path contents:
 		# <==============================================>
 		rm -fr /pkgs/* || return 2
 
-		output "~ Installing AUR packages..." yellow
+		output "~ Building AUR packages..." yellow
 
-		unlog
+		unlog_in
 
 		# <==============================================>
 		#  Loop trough AUR PKGBUILDs and install:
 		# <==============================================>
 		for pkg in "${pkgs_aur[@]}"; do
-			# Clone and makepkg
-			(su - builder -c "git -C /pkgs clone \"https://aur.archlinux.org/${pkg}.git\"") && (su - builder -c "makepkg -D \"/pkgs/$pkg\" -fcirs --noconfirm") && pkgs_ins+=("$pkg") || pkgs_uns+=("$pkg")
-			rm -fr "/pkgs/$pkg"
+			pkg="/pkgs/$pkg"
+
+			# Clone AUR repository
+			su - builder -c "git -C /pkgs clone "https://aur.archlinux.org/$(basename "$pkg").git
+
+			# Extract specific variable from PKGBUILD
+			depends=("$(source "./PKGBUILD" && echo "${depends[@]}")")
+
+			# Extract specific variable from PKGBUILD
+			makedepends=("$(source "./PKGBUILD" && echo "${makedepends[@]}")")
+
+			# Only add packages not already installed
+			for mkdp in "${makedepends[@]}"; do
+				if ! pacman -Qq "$mkdp" > /dev/null 2>&1; then
+					pkgs_tmp+=("$mkdp")
+				fi
+			done
+
+			# Install depends and makedepends
+			pacman -Sy --needed --noconfirm ${makedepends[@]} ${depends[@]}
+
+			# Build pkg, which will be stored in ~/.pkgs as per makepkg.conf
+			(su - builder -c "makepkg -D "$pkg" -fcr --noconfirm") && pkgs_ins+=("$(basename "$pkg")") || pkgs_uns+=("$(basename "$pkg")")
+
+			# Remove files that are not needed
+			rm -fr "$pkg"
+			rm -fr /tmp/makepkg/*
 		done
 
-		log
+		log_in
 
-		output "# AUR packages installed successfully!" green
+		output "# AUR packages built successfully!" green
+
+		output "~ Installing built packages..." yellow
+
+		# Install built packages
+		pacman -U --noconfirm /home/builder/.pkgs/*.pkg.tar.zst
+		# Remove makedepends packages
+		pacman -Rnsu --noconfirm ${pkgs_tmp[@]}
+
+		output "# Built packages installed successfully!" green
 
 		# <==============================================>
 		#  Remove package source path:
 		# <==============================================>
 		rm -fr /pkgs || return 2
+		rm -fr /tmp/makepkg || return 2
 		# <==============================================>
 		#  Remove temporary builder user:
 		# <==============================================>
 		userdel -fr builder || return 2
-		# <==============================================>
-		#  Remove temporary added privileges:
-		# <==============================================>
-		(grep -xFv -- "builder ALL = (root) NOPASSWD: PKGMAN" /etc/sudoers | sponge /etc/sudoers) || return 2
 
 		# <==============================================>
 		#  Loop trough dependency packages and
@@ -868,11 +939,11 @@ archroot () {
 		done
 
 		# Print installation summary
-		output "Installation Summary:" blue
+		output "Makepkg Summary:" blue
 
 		# Loop trough succesfull installations
 		for pkg in "${pkgs_ins[@]}"; do
-			output "# Installed: ${pkg}" green !
+			output "# Built: ${pkg}" green !
 		done
 		# Loop trough unsuccesfull installations
 		for pkg in "${pkgs_uns[@]}"; do
@@ -906,7 +977,11 @@ archroot () {
 		# <==============================================>
 		#  Make the UKIs for booting up:
 		# <==============================================>
-		(unlog && mkinitcpio -p linux-zen-uki && log) || return 2
+		unlog_in
+
+		mkinitcpio -p linux-zen-uki || (log_in && return 2)
+
+		log_in
 
 		output "# UKIs generated successfully!" green
 
@@ -950,8 +1025,8 @@ archroot () {
 		#useradd --system -u 999 -U -c "He who manages the System" sysop || return 2
 
 		# Gamemode group for using gamemode
-		useradd -m -u 2000 -U -G users,power,network,bluetooth,ssh,gamemode -c "TheWisker" wisker || return 2
 		useradd -m -u 2500 -U -G users -c "TheGuest" guest || return 2
+		useradd -m -u 2000 -U -G users,power,network,bluetooth,ssh,gamemode -c "TheWisker" wisker || return 2
 
 		# Lock the root account for security
 		#passwd --lock root
@@ -969,28 +1044,9 @@ archroot () {
 
 		output "~ Enabling systemd services for the system..." yellow
 
-		# Enable timesync daemon for time synchronization
-		systemctl enable systemd-timesyncd.service || return 2
-
-		# Enable systemd-{networkd, resolved} for network connection and resolution
-		systemctl enable systemd-networkd.service || return 2
-		systemctl enable systemd-resolved.service || return 2
-
-		# Enable bluetooth for having bluetooth capabilites
-		systemctl enable bluetooth.service || return 2
-
-		# Enable reflector on boot after network-online.target is reached to update mirrorlist
-		systemctl enable systemd-networkd-wait-online.service || return 2
-		systemctl enable reflector.service || return 2 # Needs systemd-networkd-wait-online.service enabled
-
-		# Enable canberra-system-bootup for having bootup, shutdown and reboot sounds using canberra
-		systemctl enable canberra-system-bootup.service || return 2
-
-		# Enable psd user unit for all users for syncing profiles (ej. firefox)
-		systemctl --global enable psd.service || return 2
-
-		# Enable xdg-user-dirs-update for updating XDG-User directories on boot
-		systemctl enable xdg-user-dirs-update.service || return 2
+		# Enable btrfs scrub timers for monthly checksum validation
+		systemctl enable btrfs-scrub@-.timer
+		systemctl enable btrfs-scrub@home.timer
 
 		# Enable btrbk backup timer for making backups every hour
 		systemctl enable btrbk@1h.timer || return 2
@@ -1001,9 +1057,28 @@ archroot () {
 		# Enable lightdm for having a display manager
 		systemctl enable lightdm.service || return 2
 
-		# Enable btrfs scrub timers for monthly checksum validation
-		systemctl enable btrfs-scrub@-.timer
-		systemctl enable btrfs-scrub@home.timer
+		# Enable bluetooth for having bluetooth capabilites
+		systemctl enable bluetooth.service || return 2
+
+		# Enable psd user unit for all users for syncing profiles (ej. firefox)
+		systemctl --global enable psd.service || return 2
+
+		# Enable systemd-{networkd, resolved} for network connection and resolution
+		systemctl enable systemd-networkd.service || return 2
+		systemctl enable systemd-resolved.service || return 2
+
+		# Enable timesync daemon for time synchronization
+		systemctl enable systemd-timesyncd.service || return 2
+
+		# Enable canberra-system-bootup for having bootup, shutdown and reboot sounds using canberra
+		systemctl enable canberra-system-bootup.service || return 2
+
+		# Enable reflector on boot after network-online.target is reached to update mirrorlist
+		systemctl enable systemd-networkd-wait-online.service || return 2
+		systemctl enable reflector.service || return 2 # Needs systemd-networkd-wait-online.service enabled
+
+		# Enable xdg-user-dirs-update for all users updating XDG-User directories on boot
+		systemctl --global enable xdg-user-dirs-update.service || return 2
 
 		output "# Systemd services enabled successfully!" green
 
@@ -1011,12 +1086,16 @@ archroot () {
 		return 0
 	}
 
-	log
+	log_in
+
+	output "\n[Archroot Setup]" purple
+
 	o_local && o_pkgs && o_boot && o_usr && o_srv
 
 	output "[Archroot Setup]" purple !
 
-	unlog
+	unlog_in && sync
+
 	return 0
 }
 # <==============================================>
@@ -1070,17 +1149,24 @@ export -f input
 export -f output
 export -f archroot
 # <==============================================>
+# Save start time to calculate difference
+# <==============================================>
+stime=$(date +%s)
+# <==============================================>
 #  Run all functions, in order, chained as to
 #  only run if the previous function has not failed
 # <==============================================>
 log && output "" off && output "$title" purple
 # <==============================================>
-if c_efi && c_net && c_part && c_mnt && c_pkg && unlog && arch-chroot /mnt /bin/bash -c "archroot"; then
+if c_efi && c_net && c_part && c_mnt && c_pkg && (unlog && sync && arch-chroot /mnt /bin/bash -c "archroot" && log); then
 	output "\n> Restart to log into the new system!" yellow !
 	output "\n> Installation completed successfully!" green !
 else
-	output "\n> Installation failed!" red !
+	log; output "\n> Installation failed!" red !
 fi
 # <==============================================>
-c_clean && unlog
+etime=$(($(date +%s) - stime))
+output "\n>> Elapsed time: $((etime / 60)) minutes $((etime % 60)) seconds"
+# <==============================================>
+c_clean
 # <==============================================>

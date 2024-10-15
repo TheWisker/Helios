@@ -40,7 +40,7 @@ changelog=
 source=("${pkgname}-${pkgver}::git+https://github.com/TheWisker/Dotfiles#tag=${pkgver}")
 noextract=()
 validpgpkeys=()
-sha512sums=('6e6aa191a5244c295905eb259a68656f4c2b962b11274a9807340892370fdbe1e944a3463b3d1b83c934046de426bb91bf0bdd6de38f034e8967a046769cd96e')
+sha512sums=('e98b0bb9c33dea0e18da72fc01911aed64171a480777a4f1a45ae14b265618de7d9dd5383b7ef6c14644875d09bc4a3e97ba8b878c25f7df9a4002481fc077d9')
 
 package() {
     mkdir -p "${pkgdir}/etc/skel/.config/"

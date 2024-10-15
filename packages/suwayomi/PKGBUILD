@@ -21,7 +21,7 @@ changelog=
 source=("$url/releases/download/$pkgver/Suwayomi-Server-$pkgver-$_revver.jar" "$url/releases/download/$pkgver/Suwayomi-Server-$pkgver-$_revver-linux-assets.tar.gz")
 noextract=("Suwayomi-Server-$pkgver-$_revver.jar")
 validpgpkeys=()
-sha512sums=('8596a99ec5571f581fd0c1c10ef032e5152cd97dda8988be0a310d736f76a32fee046af3ff07b9d10ede5964fe819c8037183d81cf6a1b8562a88c69a1fff11a' '98432deb4a763457e2f6e347b918fb8c03dafefa8d18aae82d42babe45b07e59af41e6584b741a88d066d0741efc0243f3a95064f5f18a290822d9db4c0df134')
+sha512sums=('7f4097f04ee7fad0f79bf44c701dba346ed6a015e7b4eea5f807b35eb7afbbfbe09ed994f8890edc44f7b256a1a33f3b2659c662cf470f0616e3e9a93bf3eebb' '98432deb4a763457e2f6e347b918fb8c03dafefa8d18aae82d42babe45b07e59af41e6584b741a88d066d0741efc0243f3a95064f5f18a290822d9db4c0df134')
 
 package() {
     local _pkgbase=suwayomi
