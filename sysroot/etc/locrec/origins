@@ -10,14 +10,15 @@
 # <====================================================>
 aur cavasik v2.0.1-1
 aur shikai-theme v1.5.3-1
-github TheWisker/Cavasik v2.0.1
-github vinceliuice/Orchis-theme 2024-09-02
+aur dropbox 205.4.5765-1
 github TheWisker/Zhou v0.0.2
 github TheWisker/Shikai v1.5.3
+github TheWisker/Cavasik v2.0.1
 github TheWisker/Dotfiles v1.1.0
 github TheWisker/LinuxShss v1.0.0
 github TheWisker/Playlists v2.0.0
 github Suwayomi/Suwayomi-Server v1.1.1
+github vinceliuice/Orchis-theme 2024-09-02
 github-commit L4ki/Amy-Plasma-Themes fb50eba41a9165b8d487b1b5d7482531c186acb7 main
 github-commit vinceliuice/Orchis-kde b16f639ad7530056fa89c081cfdab2b0708a2d76 main
 github-commit JezerM/sea-greeter ffd2f3c52601127a46d478cd2cd4a9e03719c73f master

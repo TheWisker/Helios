@@ -657,7 +657,6 @@ c_pkg () {
 	# <==============================================>
 	unlog
 	pacstrap -KM /mnt $pkgs || (log && return 2)
-	#pacstrap -K /mnt $pkgs || (log && return 2)
 	log
 
 	output "# Packages installed successfully!" green
@@ -688,11 +687,20 @@ c_pkg () {
 	chmod +x /mnt/etc/pacman.d/hooks/*
 
 	# <==============================================>
+	#  Copy keys for adding in archroot:
+	# <==============================================>
+	if [ -d "./keys" ]; then
+		cp ./keys/* /mnt/keys || return 2
+	fi
+
+	# <==============================================>
 	#  Copy packages for building in archroot:
 	# <==============================================>
 	# Copy recursively (-r) all files and directories
 	# <==============================================>
-	cp -r ./packages /mnt/pkgs || return 2
+	if [ -d "./packages" ]; then
+		cp -r ./packages /mnt/pkgs || return 2
+	fi
 
 	# <==============================================>
 	#  Set permissions for sudoers file:
@@ -785,8 +793,73 @@ archroot () {
 	# Build & install local packages
 	# <==============================================>
 	o_pkgs () {
-		output "\n[Local Packages]" purple
+		output "\n[Local Packages & Keys]" purple
 
+		# <==============================================>
+		#  Prevent automatic dropbox updates:
+		# <==============================================>
+		# Since at least version 2.4.6, Dropbox has had
+		# an auto-update capability which downloads a new
+		# binary to the ~/.dropbox-dist/ folder. The service
+		# then attempts to hand over control to this binary
+		# and dies, causing systemd to re-start the service,
+		# generating a conflict and an endless loop of
+		# log-filling, CPU-eating misery
+		# <==============================================>
+		# https://wiki.archlinux.org/title/Dropbox#Prevent_automatic_updates
+		# <==============================================>
+		install -dm 500 /etc/skel/.dropbox-dist || return 2
+
+		# <==============================================>
+		#  Add temporary user to build packages:
+		# <==============================================>
+		useradd -l -m -U -c "TheBuilder" builder || return 2
+		# <==============================================>
+		#  Change /pkgs ownership to said user:
+		# <==============================================>
+		chown -R builder:builder /pkgs || return 2
+
+		output "~ Initializing and populating archlinux keyring..." yellow
+
+		# <==============================================>
+		#  Initialize and populate archlinux keyring:
+		# <==============================================>
+		pacman-key --init || return 2
+		pacman-key --populate archlinux || return 2
+
+		output "# Initialized and populated archlinux keyring successfully!" green
+
+		# <==============================================>
+		#  Key array:
+		# <==============================================>
+		# Dropbox: 1C61A2656FB57B7E4DE0F4C1FC918B335044912E
+		# <==============================================>
+		keys=(1C61A2656FB57B7E4DE0F4C1FC918B335044912E)
+
+		# <==============================================>
+		#  Loop trough key array and receive the keys:
+		# <==============================================>
+		for key in "${keys[@]}"; do
+		    (su - builder -c "gpg --recv-keys "$key)
+		done
+
+		# <==============================================>
+		#  Loop trough key files and import the keys:
+		# <==============================================>
+		for key in /keys/*; do
+		    (su - builder -c "gpg --import "$key)
+		done
+
+		# <==============================================>
+		#  Package arrays:
+		# <==============================================>
+		# pkgs: Local packages to install from ./packages
+		# pkgs_deps: Installed packages to mark as deps
+		# pkgs_aur: Remote AUR packages to install
+		# pkgs_tmp: Cache array to save makedepends to
+		# pkgs_ins: Cache array to save built packages to
+		# pkgs_uns: Cache array to save failed packages to
+		# <==============================================>
 		pkgs=(sea-greeter shikai-theme orchis-gtk-theme orchis-kvantum-theme amy-icon-theme xcursor-hacked enchanted-sound-theme zhou-theme yt-playlist suwayomi linuxshss dotfiles)
 		pkgs_deps=(calf lsp-plugins-lv2 ffmpegthumbs kdegraphics-thumbnailers libcanberra python-pygments python-gpgme smplayer-skins smplayer-themes xclip)
 		pkgs_aur=(dropbox jdownloader2)
@@ -798,30 +871,6 @@ archroot () {
 		#  Update mirrorlist:
 		# <==============================================>
 		reflector --connection-timeout 10 --download-timeout 30 --cache-timeout 300 --url https://archlinux.org/mirrors/status/json/ --save /etc/pacman.d/mirrorlist --sort rate --threads 2 --age 24 --delay 2 --country Spain,Portugal,France, --latest 8 --protocol https
-
-		# <==============================================>
-		#  Add temporary user to build packages:
-		# <==============================================>
-		useradd -l -m -U -c "TheBuilder" builder || return 2
-		# <==============================================>
-		#  Change /pkgs ownership to said user:
-		# <==============================================>
-		chown -R builder:builder /pkgs || return 2
-		# <==============================================>
-		#  Make building dirs and give permissions:
-		# <==============================================>
-		#mkdir -p /tmp/makepkg/{out, src} || return 2
-		#chown -R builder:builder /tmp/makepkg/{out, src} || return 2
-
-		output "~ Initializing and populating archlinux keyring..." yellow
-
-		# <==============================================>
-		#  Initialize and populate archlinux keyring:
-		# <==============================================>
-		pacman-key --init || return 2
-		pacman-key --populate archlinux || return 2
-
-		output "# Initialized and populated archlinux keyring successfully!" green
 
 		output "~ Building local packages..." yellow
 
@@ -849,7 +898,7 @@ archroot () {
 				# Install depends and makedepends
 				pacman -Sy --needed --noconfirm ${makedepends[@]} ${depends[@]}
 
-				# Build pkg, which will be stored in ~/.pkgs as per makepkg.conf
+				# Build pkg, which will be stored in ~/.makepkg/pkg as per makepkg.conf
 				(su - builder -c "makepkg -D "$pkg" -fcr --noconfirm") && pkgs_ins+=("$(basename "$pkg")") || pkgs_uns+=("$(basename "$pkg")")
 
 				# Remove files that are not needed
@@ -857,9 +906,6 @@ archroot () {
 				rm -fr /tmp/makepkg/*
 			fi
 		done
-
-		#LOOKOUT
-		#install -dm 500 /etc/skel/.dropbox-dist || return 2 # instead of -dm0 use -dm 444
 
 		log_in
 
@@ -899,7 +945,7 @@ archroot () {
 			# Install depends and makedepends
 			pacman -Sy --needed --noconfirm ${makedepends[@]} ${depends[@]}
 
-			# Build pkg, which will be stored in ~/.pkgs as per makepkg.conf
+			# Build pkg, which will be stored in ~/.makepkg/pkg as per makepkg.conf
 			(su - builder -c "makepkg -D "$pkg" -fcr --noconfirm") && pkgs_ins+=("$(basename "$pkg")") || pkgs_uns+=("$(basename "$pkg")")
 
 			# Remove files that are not needed
@@ -913,17 +959,21 @@ archroot () {
 
 		output "~ Installing built packages..." yellow
 
+		unlog_in
+
 		# Install built packages
-		pacman -U --noconfirm /home/builder/.pkgs/*.pkg.tar.zst
+		pacman -U --noconfirm /home/builder/.makepkg/pkg/*.pkg.tar.zst
 		# Remove makedepends packages
 		pacman -Rnsu --noconfirm ${pkgs_tmp[@]}
+
+		log_in
 
 		output "# Built packages installed successfully!" green
 
 		# <==============================================>
-		#  Remove package source path:
+		#  Remove source paths:
 		# <==============================================>
-		rm -fr /pkgs || return 2
+		rm -fr /{keys, pkgs} || return 2
 		rm -fr /tmp/makepkg || return 2
 		# <==============================================>
 		#  Remove temporary builder user:
@@ -953,7 +1003,7 @@ archroot () {
 		# Pause until key is pressed
 		input pause ">> Press *Enter* to continue..." cyan
 
-		output "[Local Packages]" purple !
+		output "[Local Packages & Keys]" purple !
 		return 0
 	}
 
@@ -988,12 +1038,11 @@ archroot () {
 		output "~ Creating boot entries for the UKIs..." yellow
 
 		# <==============================================>
-		#  Make the UKIs for booting up:
+		#  Create boot entries for booting up:
 		# <==============================================>
 		efibootmgr --create --disk $device --part 1 --label "Arch Linux" --loader '/EFI/Linux/arch-linux.efi' --unicode || return 2
 		efibootmgr --create --disk $device --part 1 --label "Arch Linux: Normal" --loader '/EFI/Linux/arch-linux-normal.efi' --unicode || return 2
 		efibootmgr --create --disk $device --part 1 --label "Arch Linux: Fallback" --loader '/EFI/Linux/arch-linux-fallback.efi' --unicode || return 2
-		# Mount uefi vars read only for security ??? /sys/firmware/efi/efivars
 
 		output "# Boot entries created successfully!" green
 
@@ -1019,10 +1068,6 @@ archroot () {
 		groupadd -f -g 1800 storage || return 2
 		groupadd -f -g 1900 ssh || return 2
 		groupadd -f -g 2000 autologin || return 2
-
-		# Administrator accounts
-		#useradd --system -u 666 -U -c "He who manages the Packages" pkgop || return 2
-		#useradd --system -u 999 -U -c "He who manages the System" sysop || return 2
 
 		# Gamemode group for using gamemode
 		useradd -m -u 2500 -U -G users -c "TheGuest" guest || return 2
@@ -1166,7 +1211,7 @@ else
 fi
 # <==============================================>
 etime=$(($(date +%s) - stime))
-output "\n>> Elapsed time: $((etime / 60)) minutes $((etime % 60)) seconds"
+output "" off && output "\n>> Elapsed time: $((etime / 60)) minutes $((etime % 60)) seconds" purple
 # <==============================================>
 c_clean
 # <==============================================>

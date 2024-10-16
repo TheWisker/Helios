@@ -1,0 +1,6 @@
+# Ignore specific log files
+./helios.in.log
+./helios.out.log
+
+# Ignore all files in the keys directory
+./keys/*
