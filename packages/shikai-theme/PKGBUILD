@@ -29,5 +29,5 @@ prepare() {
 
 package() {
     mkdir -p "${pkgdir}/usr/share/web-greeter/themes/shikai/"
-    cp -r "${srcdir}/${pkgname}-${pkgver}/dist/" "${pkgdir}/usr/share/web-greeter/themes/shikai/"
+    cp -r "${srcdir}/${pkgname}-${pkgver}/dist/"* "${pkgdir}/usr/share/web-greeter/themes/shikai/"
 }
