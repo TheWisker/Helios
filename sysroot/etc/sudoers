@@ -84,26 +84,31 @@ Defaults    secure_path         =   "~/.local/bin:/usr/local/sbin:/usr/local/bin
 # <============================================================>
 #  Commands Alias:
 # <============================================================>
-Cmnd_Alias  POWER       =   /usr/bin/shutdown -h now, /usr/bin/halt, /usr/bin/poweroff, /usr/bin/reboot, /usr/bin/systemctl sleep|reboot|suspend|poweroff|hibernate
-Cmnd_Alias  STORAGE     =   /usr/bin/mount, /usr/bin/umount, /usr/bin/fdisk
-# <============================================================>
-Cmnd_Alias  SYSTEMD     =   /usr/bin/journalctl, /usr/bin/systemctl
-Cmnd_Alias  KILL        =   /usr/bin/pkill, /usr/bin/kill, /usr/bin/killall
-Cmnd_Alias  PKGMAN      =   /usr/bin/pacman, /usr/bin/makepkg
+Cmnd_Alias  POWER       =   /usr/bin/systemctl sleep|reboot|suspend|poweroff|hibernate
+Cmnd_Alias  STORAGE     =   /usr/bin/mount, /usr/bin/umount
 Cmnd_Alias  NETWORK     =   /usr/bin/netctl, /usr/bin/systemctl enable|disable|restart|reenable|start|stop networkd.service, /usr/bin/systemctl enable|disable|restart|reenable|start|stop resolved.service
 # <============================================================>
-Cmnd_Alias  PSSWD       =   /usr/bin/passwd [A-Za-z]*, /usr/bin/passwd -l root, /usr/bin/passwd -u root, /usr/bin/faillock --user [A-Za-z]* --reset, !/usr/bin/passwd root
-Cmnd_Alias  SHELL       =   /usr/bin/zsh, /usr/bin/bash, /usr/bin/fish
+Cmnd_Alias  STGMAN      =   /usr/bin/fdisk
+Cmnd_Alias  PKGMAN      =   /usr/bin/pacman, /usr/bin/makepkg
+Cmnd_Alias  USRMAN      =   /usr/bin/useradd, /usr/bin/userdel
+Cmnd_Alias  FSYMAN      =   /usr/bin/cp, /usr/bin/mv, /usr/bin/rm, /usr/bin/mkdir, /usr/bin/chown, /usr/bin/chmod
+# <============================================================>
+Cmnd_Alias  SYSTEMD     =   /usr/bin/systemctl, /usr/bin/journalctl
+Cmnd_Alias  KILL        =   /usr/bin/kill, /usr/bin/pkill, /usr/bin/killall
+# <============================================================>
+Cmnd_Alias  PSSWD       =   /usr/bin/passwd [A-Za-z]*, /usr/bin/passwd -u root, /usr/bin/faillock --user [A-Za-z]* --reset, !/usr/bin/passwd root
+Cmnd_Alias  SHELL       =   /usr/bin/bash, /usr/bin/zsh, /usr/bin/fish
 # <============================================================>
 #  User & Group Privileges Specification:
 # <============================================================>
 %power      ALL         =   (root)  NOPASSWD: POWER
-%network    ALL         =   (root)  NETWORK
 %storage    ALL         =   (root)  STORAGE
+%network    ALL         =   (root)  NETWORK
 # <============================================================>
 root        ALL         =   (ALL)   ALL
 # <============================================================>
-wisker	    ALL         =   (root)  SHELL, PKGMAN, SYSTEMD, KILL
+wisker	    ALL         =   (root)  PKGMAN, SYSTEMD, KILL
+wisker	    ALL         =   (root)  NOPASSWD: /usr/bin/pacman -Syu
 # <============================================================>
 #  Drop-in Files:
 # <============================================================>

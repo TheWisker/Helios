@@ -236,8 +236,8 @@ c_part () {
 		unit:sectors
 		table-length:8
 		sector-size:4096
-		name="ESP", size=1G, type=uefi
-		name="Archy", size=+, type=linux
+		name="ArchyESP", size=1G, type=uefi
+		name="ArchyLinux", size=+, type=linux
 	EOF
 
 	output "# Device partitioned successfully!" green
@@ -281,7 +281,7 @@ c_part () {
 	# <==============================================>
 	# Create any missing parent (-p) directories
 	# <==============================================>
-	btrfs subvolume create /mnt/@arch || return 2 # Mount: /
+	btrfs subvolume create /mnt/@archy || return 2 # Mount: /
 	btrfs subvolume create /mnt/@home || return 2 # Mount: /home
 	btrfs subvolume create /mnt/@root || return 2 # Mount: /root
 	btrfs subvolume create /mnt/@cache || return 2 # Mount: /var/cache
@@ -290,7 +290,7 @@ c_part () {
 	btrfs subvolume create /mnt/@snap || return 2 # Mount: /var/snap
 	btrfs subvolume create /mnt/@swap || return 2 # Mount: /var/swap
 	btrfs subvolume create /mnt/@srv || return 2 # Mount: /srv
-	btrfs subvolume create /mnt/@shr || return 2 # Mount: /media/shr
+	btrfs subvolume create /mnt/@shr || return 2 # Mount: /media/Share
 	btrfs subvolume set-default /mnt/@shr || return 2 # When mounting the btrfs partition default to mounting the @shr subvolume
 
 	output "# Subvolumes created successfully!" green
@@ -356,7 +356,7 @@ c_mnt() {
 	# <==============================================>
 	# Use the specified mount options (-o)
 	# <==============================================>
-	mount -m ${device}p2 /mnt -o subvol='@arch',$mnt_opts_btrfs,ssd || return 2
+	mount -m ${device}p2 /mnt -o subvol='@archy',$mnt_opts_btrfs,ssd || return 2
 	mount -m ${device}p2 /mnt/home -o subvol='@home',$mnt_opts_btrfs,ssd || return 2
 	mount -m ${device}p2 /mnt/root -o subvol='@root',$mnt_opts_btrfs,ssd || return 2
 	mount -m ${device}p2 /mnt/var/cache -o subvol='@cache',$mnt_opts_btrfs,ssd || return 2
@@ -365,7 +365,7 @@ c_mnt() {
 	mount -m ${device}p2 /mnt/var/snap -o subvol='@snap',$mnt_opts_btrfs,ssd || return 2
 	mount -m ${device}p2 /mnt/var/swap -o subvol='@swap',$mnt_opts_btrfs,ssd || return 2
 	mount -m ${device}p2 /mnt/srv -o subvol='@srv',$mnt_opts_btrfs,ssd || return 2
-	mount -m ${device}p2 /mnt/media/shr -o subvol='@shr',$mnt_opts_btrfs,ssd || return 2
+	mount -m ${device}p2 /mnt/media/Share -o subvol='@shr',$mnt_opts_btrfs,ssd || return 2
 	# <==============================================>
 	#  Mount esp partition:
 	# <==============================================>
@@ -564,11 +564,11 @@ c_pkg () {
 	# polkit: Application-level toolkit for defining and handling the policy that allows unprivileged processes to speak to privileged processes
 	# polkit-kde-agent: Polkit graphical agent for requesting credentials
 	# xdg-desktop-portal: Portals to provide uniform access to features independent of desktops and toolkits
-	# xdg-desktop-portal-kde: Kde xdg-desktop-portal backend
+	# xdg-desktop-portal-gtk: Generic gtk xdg-desktop-portal backend
 	# xsettingsd: Lightweight xsettings daemon which provides settings to Xorg applications
 	# python-gpgme: Required for launching dropbox for the first time (orphan dependency) -> https://wiki.archlinux.org/title/Dropbox#Required_packages
 	# <==============================================>
-	desktop_pkgs='xorg-server xorg-xrdb xorg-server-xephyr xdotool lightdm light-locker awesome picom xdg-user-dirs accountsservice playerctl hicolor-icon-theme kvantum xclip python-pywal polkit polkit-kde-agent xdg-desktop-portal xdg-desktop-portal-kde xsettingsd python-gpgme'
+	desktop_pkgs='xorg-server xorg-xrdb xorg-server-xephyr xdotool lightdm light-locker awesome picom xdg-user-dirs accountsservice playerctl hicolor-icon-theme kvantum xclip python-pywal polkit polkit-kde-agent xdg-desktop-portal xdg-desktop-portal-gtk xsettingsd python-gpgme'
 	# <==============================================>
 	#  Font Packages:
 	# <==============================================>
@@ -860,7 +860,7 @@ archroot () {
 		# pkgs_ins: Cache array to save built packages to
 		# pkgs_uns: Cache array to save failed packages to
 		# <==============================================>
-		pkgs=(sea-greeter shikai-theme orchis-gtk-theme orchis-kvantum-theme amy-icon-theme xcursor-hacked enchanted-sound-theme zhou-theme yt-playlist suwayomi linuxshss dotfiles)
+		pkgs=(web-greeter shikai-theme orchis-gtk-theme orchis-kvantum-theme amy-icon-theme xcursor-hacked enchanted-sound-theme zhou-theme yt-playlist suwayomi linuxshss dotfiles)
 		pkgs_deps=(calf lsp-plugins-lv2 ffmpegthumbs kdegraphics-thumbnailers libcanberra python-pygments python-gpgme smplayer-skins smplayer-themes xclip)
 		pkgs_aur=(dropbox jdownloader2)
 		pkgs_tmp=()
@@ -973,7 +973,14 @@ archroot () {
 		# <==============================================>
 		#  Remove source paths:
 		# <==============================================>
-		rm -fr /{keys, pkgs} || return 2
+		if [ -d "/pkgs" ]; then
+			rm -fr /pkgs || return 2
+		fi
+		# <==============================================>
+		if [ -d "/keys" ]; then
+			rm -fr /keys || return 2
+		fi
+		# <==============================================>
 		rm -fr /tmp/makepkg || return 2
 		# <==============================================>
 		#  Remove temporary builder user:
@@ -1040,9 +1047,15 @@ archroot () {
 		# <==============================================>
 		#  Create boot entries for booting up:
 		# <==============================================>
-		efibootmgr --create --disk $device --part 1 --label "Arch Linux" --loader '/EFI/Linux/arch-linux.efi' --unicode || return 2
-		efibootmgr --create --disk $device --part 1 --label "Arch Linux: Normal" --loader '/EFI/Linux/arch-linux-normal.efi' --unicode || return 2
-		efibootmgr --create --disk $device --part 1 --label "Arch Linux: Fallback" --loader '/EFI/Linux/arch-linux-fallback.efi' --unicode || return 2
+		#  Commented as my EFI does not seem to care
+		# <==============================================>
+		#efibootmgr --create --disk $device --part 1 --label "Archy Linux" --loader '/EFI/Linux/archy-linux.efi' --unicode || return 2
+		#efibootmgr --create --disk $device --part 1 --label "Archy Linux: Fallback" --loader '/EFI/Linux/archy-linux-fallback.efi' --unicode || return 2
+		# <==============================================>
+		#  Instead use default fallback location:
+		# <==============================================>
+		mkdir -p /boot/EFI/BOOT
+		cp /boot/EFI/Linux/archy-linux.efi /boot/EFI/BOOT/BOOTX64.EFI
 
 		output "# Boot entries created successfully!" green
 
@@ -1063,18 +1076,20 @@ archroot () {
 		# <==============================================>
 		groupadd -f -g 1500 users || return 2
 		groupadd -f -g 1600 power || return 2
-		groupadd -f -g 1700 network || return 2
-		groupadd -f -g 1750 bluetooth || return 2
-		groupadd -f -g 1800 storage || return 2
-		groupadd -f -g 1900 ssh || return 2
-		groupadd -f -g 2000 autologin || return 2
+		groupadd -f -g 1700 storage || return 2
+		groupadd -f -g 1800 network || return 2
+		groupadd -f -g 1900 bluetooth || return 2
 
-		# Gamemode group for using gamemode
-		useradd -m -u 2500 -U -G users -c "TheGuest" guest || return 2
-		useradd -m -u 2000 -U -G users,power,network,bluetooth,ssh,gamemode -c "TheWisker" wisker || return 2
+		# <==============================================>
+		#  Users:
+		# <==============================================>
+		useradd -m -u 2000 -U -G users,power,gamemode umbra || return 2
+		useradd -m -u 2100 -U -G users,power,gamemode pulse || return 2
+		useradd -m -u 2200 -U -G users,power,gamemode codex || return 2
+		useradd -m -u 2300 -U -G users,power,gamemode vortex || return 2
+		useradd -m -u 2400 -U -G users,power,gamemode tempest || return 2
+		useradd -m -u 2500 -U -G users,power,storage,network,bluetooth,gamemode wisker || return 2
 
-		# Lock the root account for security
-		#passwd --lock root
 		output "[Users & Groups]" purple !
 		return 0
 	}
@@ -1169,14 +1184,14 @@ c_clean () {
 	# <==============================================>
 	#  Swapoff swapfile:
 	# <==============================================>
-	swapoff /mnt/var/swap/swapfile
+	#swapoff /mnt/var/swap/swapfile
 
 	# <==============================================>
 	#  Unmount all mounts for new root:
 	# <==============================================>
 	# Unmount recursively (-R) all mounts
 	# <==============================================>
-	umount -R /mnt
+	#umount -R /mnt
 
 	output "# Cleaned after installation successfully!" green
 

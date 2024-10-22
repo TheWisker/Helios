@@ -10,10 +10,12 @@
 # <=========================================================>
 #                     @Author: TheWisker
 # <=========================================================>
-rw libahci.ignore_sss=1 fsck.mode=skip nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nowatchdog quiet bgrt_disable zswap.enabled=1 zswap.compressor=zstd zswap.max_pool_percent=25 zswap.zpool=z3fold
+rw libahci.ignore_sss=1 fsck.mode=skip root="PARTLABEL=ArchyLinux" rootflags=subvol=/@archy nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nowatchdog bgrt_disable zswap.enabled=1 zswap.compressor=zstd zswap.max_pool_percent=25 zswap.zpool=zsmalloc
 # <=========================================================>
 # Disable staggered spin-up: libahci.ignore_sss=1
 # Disable fsck for root filesystem as it is btrfs: fsck.mode=skip
+# Specify root partition: root=PARTLABEL=ArchyLinux
+# Specify root subvolume: rootflags=subvol=/@archy
 # Enable DRM for early kernel mode setting for NVIDIA: nvidia_drm.modeset=1
 # Tell the NVIDIA driver to provide its own framebuffer device: nvidia_drm.fbdev=1
 # Disable watchdog timers as to improve performance: nowatchdog
@@ -22,5 +24,5 @@ rw libahci.ignore_sss=1 fsck.mode=skip nvidia_drm.modeset=1 nvidia_drm.fbdev=1 n
 # Enable use of zswap: zswap.enabled=1
 # Use zstd as zswap compressor: zswap.compressor=zstd
 # Set maximum percentage for zswap to 25: zswap.max_pool_percent=25
-# Use z3fold as the zswap compressed memory pool allocator: zswap.zpool=z3fold
+# Use zsmalloc as the zswap compressed memory pool allocator: zswap.zpool=zsmalloc
 # <=========================================================>

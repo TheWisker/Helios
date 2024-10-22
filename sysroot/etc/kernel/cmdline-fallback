@@ -10,7 +10,9 @@
 # <=========================================================>
 #                     @Author: TheWisker
 # <=========================================================>
-ro nomodeset i915.modeset=0 nouveau.modeset=0
+ro nomodeset root="PARTLABEL=ArchyLinux" rootflags=subvol=/@archy i915.modeset=0 nouveau.modeset=0
 # <=========================================================>
+# Specify root partition: root=PARTLABEL=ArchyLinux
+# Specify root subvolume: rootflags=subvol=/@archy
 # Disable early kernel mode setting for all cards: nomodeset i915.modeset=0 nouveau.modeset=0
 # <=========================================================>

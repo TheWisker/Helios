@@ -28,7 +28,7 @@ prepare() {
 }
 
 build() {
-    make -C "$srcdir/${pkgname}-${pkgver}" build
+    make -j1 -C "$srcdir/${pkgname}-${pkgver}" build
 }
 
 package() {

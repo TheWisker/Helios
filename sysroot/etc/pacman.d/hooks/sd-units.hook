@@ -19,7 +19,7 @@ Target = *
 # <===============================================================>
 [Action]
 Description = Searching for installed systemd unit files...
-Exec = /usr/bin/bash -c 'tr " " "\\n" | while IFS= read -r trg; do /usr/bin/pacman -Qql --color always "$trg" | /usr/bin/grep -E "\.(service|socket|timer)$"; done'
+Exec = /usr/bin/bash -c 'tr " " "\\n" | while IFS= read -r trg; do /usr/bin/pacman -Qql --color always "$trg" | /usr/bin/grep -E "\.(service|socket|timer)$" || true; done'
 When = PostTransaction
 Depends = pacman
 Depends = grep

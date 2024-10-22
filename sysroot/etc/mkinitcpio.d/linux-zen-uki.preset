@@ -17,21 +17,16 @@ ALL_config="/etc/mkinitcpio.conf"
 # Specifies kernel version to use for the UKI
 ALL_kver="/boot/vmlinuz-linux-zen"
 # Presets to generate UKIs for
-PRESETS=('minimal' 'normal' 'fallback')
-# <==============================================================================================>
-#  Minimal UKI:
-# <==============================================================================================>
-minimal_uki="/boot/EFI/Linux/arch-linux.efi"
-minimal_options="--cmdline=/etc/kernel/cmdline"
+PRESETS=('normal' 'fallback')
 # <==============================================================================================>
 #  Normal UKI:
 # <==============================================================================================>
-normal_uki="/boot/EFI/Linux/arch-linux-normal.efi"
-normal_options="--cmdline=/etc/kernel/cmdline-normal --splash=/usr/share/systemd/bootctl/splash-arch.bmp"
+normal_uki="/boot/EFI/Linux/archy-linux.efi"
+normal_options="--cmdline=/etc/kernel/cmdline"
 # <==============================================================================================>
 #  Fallback UKI:
 # <==============================================================================================>
-fallback_uki="/boot/EFI/Linux/arch-linux-fallback.efi"
+fallback_uki="/boot/EFI/Linux/archy-linux-fallback.efi"
 # Fallback image must skip the autodetect hook to add a wider range of modules, thus enhancing compatibility
 fallback_options="--cmdline=/etc/kernel/cmdline-fallback -S autodetect -S microcode -S strip -A keyboard -A fsck"
 # <==============================================================================================>

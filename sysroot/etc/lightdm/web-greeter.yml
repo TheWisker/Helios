@@ -19,7 +19,7 @@
 # NOTE: Paths must be accessible to the lightdm system user account (so they cannot be anywhere in /home)
 # <============================================================================================>
 branding:
-    background_images_dir: /usr/share/web-greeter/themes/shikai/assets/media/wallpapers/
+    background_images_dir: /usr/share/wallpapers
     logo_image: /usr/share/web-greeter/themes/shikai/assets/media/logos/
     user_image: /usr/share/web-greeter/themes/default/img/antergos.png
 # <============================================================================================>
