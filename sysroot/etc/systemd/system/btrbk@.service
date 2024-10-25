@@ -17,6 +17,5 @@ Documentation=man:btrbk(1)
 [Service]
 Type=oneshot
 TimeoutStopSec=60
-ExecStop=/bin/kill -s SIGTERM $MAINPID
 ExecStart=/usr/bin/btrbk run %i
 # <===========================================================================================================>

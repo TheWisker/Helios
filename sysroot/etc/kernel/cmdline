@@ -10,9 +10,10 @@
 # <=========================================================>
 #                     @Author: TheWisker
 # <=========================================================>
-rw libahci.ignore_sss=1 fsck.mode=skip root="PARTLABEL=ArchyLinux" rootflags=subvol=/@archy nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nowatchdog bgrt_disable zswap.enabled=1 zswap.compressor=zstd zswap.max_pool_percent=25 zswap.zpool=zsmalloc
+rw libahci.ignore_sss=1 libata.noacpi=1 fsck.mode=skip root="PARTLABEL=ArchyLinux" rootflags=subvol=/@archy nvidia_drm.modeset=1 nvidia_drm.fbdev=1 nowatchdog bgrt_disable zswap.enabled=1 zswap.compressor=zstd zswap.max_pool_percent=25 zswap.zpool=zsmalloc
 # <=========================================================>
 # Disable staggered spin-up: libahci.ignore_sss=1
+# Disable ACPI-related optimizations for the ATA subsystem to fix BIOS Bugs AE_NOT_FOUND: libata.noacpi=1
 # Disable fsck for root filesystem as it is btrfs: fsck.mode=skip
 # Specify root partition: root=PARTLABEL=ArchyLinux
 # Specify root subvolume: rootflags=subvol=/@archy

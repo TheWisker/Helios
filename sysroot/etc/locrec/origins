@@ -9,8 +9,10 @@
 
 # <====================================================>
 aur cavasik v2.0.1-1
+aur web-greeter 3.5.3-2
+aur dropbox 210.4.4854-1
 aur shikai-theme v1.5.3-1
-aur dropbox 205.4.5765-1
+aur awesome-git 4.3.1347.ga1f58ab97-1
 github TheWisker/Zhou v0.0.2
 github TheWisker/Shikai v1.5.3
 github TheWisker/Cavasik v2.0.1
@@ -21,6 +23,5 @@ github Suwayomi/Suwayomi-Server v1.1.1
 github vinceliuice/Orchis-theme 2024-09-02
 github-commit L4ki/Amy-Plasma-Themes fb50eba41a9165b8d487b1b5d7482531c186acb7 main
 github-commit vinceliuice/Orchis-kde b16f639ad7530056fa89c081cfdab2b0708a2d76 main
-github-commit JezerM/sea-greeter ffd2f3c52601127a46d478cd2cd4a9e03719c73f master
 github-commit rtlewis88/rtl88-Themes 202f7f5d680d4632e2de97eb532fd6b3202019b6 Enchanted-Complete-System-Sounds
 # <====================================================>

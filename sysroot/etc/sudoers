@@ -34,9 +34,6 @@ Defaults    env_reset
 # Whether to insult the user when they input a wrong password
 Defaults    insults
 # <============================================================>
-# Whether to execute all commands in noexec mode
-Defaults    noexec
-# <============================================================>
 # Whether to provide a visual feedback when a user presses a key when inputting the password
 Defaults    pwfeedback
 # <============================================================>
@@ -65,7 +62,7 @@ Defaults    timestamp_timeout   =   0.5
 Defaults    editor              =   "/usr/bin/nano:/usr/bin/micro"
 # <============================================================>
 # Prompt to use when asking for a password
-Defaults    passprompt          =   "^G[SUDO] (%u -> %U) Password for %p: "
+Defaults    passprompt          =   "\a[SUDO] (%u -> %U) Password for %p: "
 # <============================================================>
 # Default user to run commands as
 Defaults    runas_default       =   root

@@ -552,7 +552,7 @@ c_pkg () {
 	# xdotool: Command-line X11 automation tool
 	# lightdm: Provides a display manager
 	# light-locker: Uses lightdm to lock the user session on request and on events
-	# awesome: Provides Awesome Window Manager to manage clients
+	# numlockx: Turns on the numlock key in X11
 	# picom: Provides a compositor to add visual effects to clients
 	# xdg-user-dirs: Implements the XDG User Dirs directory specification
 	# accountsservice: D-Bus interface for user account query and manipulation
@@ -568,7 +568,7 @@ c_pkg () {
 	# xsettingsd: Lightweight xsettings daemon which provides settings to Xorg applications
 	# python-gpgme: Required for launching dropbox for the first time (orphan dependency) -> https://wiki.archlinux.org/title/Dropbox#Required_packages
 	# <==============================================>
-	desktop_pkgs='xorg-server xorg-xrdb xorg-server-xephyr xdotool lightdm light-locker awesome picom xdg-user-dirs accountsservice playerctl hicolor-icon-theme kvantum xclip python-pywal polkit polkit-kde-agent xdg-desktop-portal xdg-desktop-portal-gtk xsettingsd python-gpgme'
+	desktop_pkgs='xorg-server xorg-xrdb xorg-server-xephyr xdotool lightdm light-locker numlockx picom xdg-user-dirs accountsservice playerctl hicolor-icon-theme kvantum xclip python-pywal polkit polkit-kde-agent xdg-desktop-portal xdg-desktop-portal-gtk xsettingsd python-gpgme'
 	# <==============================================>
 	#  Font Packages:
 	# <==============================================>
@@ -862,7 +862,7 @@ archroot () {
 		# <==============================================>
 		pkgs=(web-greeter shikai-theme orchis-gtk-theme orchis-kvantum-theme amy-icon-theme xcursor-hacked enchanted-sound-theme zhou-theme yt-playlist suwayomi linuxshss dotfiles)
 		pkgs_deps=(calf lsp-plugins-lv2 ffmpegthumbs kdegraphics-thumbnailers libcanberra python-pygments python-gpgme smplayer-skins smplayer-themes xclip)
-		pkgs_aur=(dropbox jdownloader2)
+		pkgs_aur=(awesome-git dropbox jdownloader2)
 		pkgs_tmp=()
 		pkgs_ins=()
 		pkgs_uns=()
@@ -1088,7 +1088,7 @@ archroot () {
 		useradd -m -u 2200 -U -G users,power,gamemode codex || return 2
 		useradd -m -u 2300 -U -G users,power,gamemode vortex || return 2
 		useradd -m -u 2400 -U -G users,power,gamemode tempest || return 2
-		useradd -m -u 2500 -U -G users,power,storage,network,bluetooth,gamemode wisker || return 2
+		useradd -m -u 2500 -U -G users,power,storage,network,bluetooth,gamemode,adm wisker || return 2
 
 		output "[Users & Groups]" purple !
 		return 0
